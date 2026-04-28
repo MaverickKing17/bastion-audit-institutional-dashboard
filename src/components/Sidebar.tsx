@@ -4,6 +4,7 @@ import { Shield, Globe, Activity, Database, Fingerprint, Lock, ShieldCheck, Chev
 interface SidebarProps {
   currentView: 'dashboard' | 'health';
   onViewChange: (view: 'dashboard' | 'health') => void;
+  onSelectFramework: (framework: any) => void;
 }
 
 function NavItem({ active, onClick, icon, label }: { active: boolean, onClick: () => void, icon: React.ReactNode, label: string }) {
@@ -23,7 +24,7 @@ function NavItem({ active, onClick, icon, label }: { active: boolean, onClick: (
   );
 }
 
-export function Sidebar({ currentView, onViewChange }: SidebarProps) {
+export function Sidebar({ currentView, onViewChange, onSelectFramework }: SidebarProps) {
   return (
     <div className="w-72 border-r border-bastion-border bg-bastion-navy p-6 flex flex-col gap-8">
       <div className="flex items-center gap-3 mb-4">
@@ -85,9 +86,9 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
               CA-CENTRAL
             </span>
           </div>
-          <div className="flex justify-between items-center text-[10px]">
-            <span className="text-slate-500 uppercase font-medium">Compliance</span>
-            <span className="text-bastion-green font-bold uppercase tracking-tight">E-21 Verified</span>
+          <div className="flex justify-between items-center text-[10px] group cursor-pointer" onClick={() => onSelectFramework('OSFI E-21')}>
+            <span className="text-slate-500 uppercase font-medium group-hover:text-slate-400 transition-colors">Compliance</span>
+            <span className="text-bastion-green font-bold uppercase tracking-tight group-hover:brightness-110 transition-all">E-21 Verified</span>
           </div>
         </div>
       </div>

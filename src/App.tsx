@@ -7,6 +7,7 @@ import { KillSwitchFlow } from './components/KillSwitchFlow';
 import { SystemHealthDashboard } from './components/SystemHealthDashboard';
 import { Footer } from './components/Footer';
 import { Chat } from './components/Chat';
+import { RegulatoryContent, RegulatoryFramework } from './components/RegulatoryContent';
 import { Severity, SecurityEvent } from './types';
 import { Activity, ShieldCheck, Power, Search, Bell, UserCircle, LayoutGrid } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -29,6 +30,7 @@ export default function App() {
   const [events, setEvents] = useState<SecurityEvent[]>(INITIAL_EVENTS);
   const [isKillSwitchOpen, setIsKillSwitchOpen] = useState(false);
   const [currentView, setCurrentView] = useState<'dashboard' | 'health'>('dashboard');
+  const [selectedFramework, setSelectedFramework] = useState<RegulatoryFramework | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,7 +51,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen overflow-hidden font-sans">
-      <Sidebar currentView={currentView} onViewChange={setCurrentView} />
+      <Sidebar currentView={currentView} onViewChange={setCurrentView} onSelectFramework={setSelectedFramework} />
       
       <main className="flex-1 flex flex-col bg-[#0B1221] overflow-hidden">
         {/* Institutional TopNav */}
@@ -145,30 +147,30 @@ export default function App() {
                 <div className="h-px bg-gradient-to-r from-transparent via-bastion-border to-transparent" />
 
                 {/* TIER 2: Analyst Operational Zone */}
-                <section id="tier-2" className="grid grid-cols-12 gap-8 h-[550px]">
-                  <div className="col-span-8 flex flex-col">
-                    <div className="flex-1 bg-bastion-navy border border-bastion-border rounded-xl shadow-2xl relative overflow-hidden">
+                <section id="tier-2" className="grid grid-cols-12 gap-8 min-h-[600px]">
+                  <div className="col-span-12 xl:col-span-8 flex flex-col">
+                    <div className="flex-1 bg-bastion-navy border border-bastion-border rounded-xl shadow-2xl relative overflow-hidden min-h-[500px]">
                        <AgentBehaviorStream events={events} />
                     </div>
                   </div>
                   
-                  <div className="col-span-4 space-y-6">
-                    <div className="bg-bastion-navy border border-bastion-border rounded-xl p-8 shadow-xl h-full flex flex-col">
-                       <div className="flex items-center gap-3 mb-10 text-slate-500">
+                  <div className="col-span-12 xl:col-span-4 flex flex-col">
+                    <div className="flex-1 bg-bastion-navy border border-bastion-border rounded-xl p-10 shadow-xl flex flex-col">
+                       <div className="flex items-center gap-3 mb-12 text-slate-500">
                          <div className="p-2 bg-bastion-sapphire/5 rounded-lg border border-bastion-sapphire/10">
                            <ShieldCheck size={16} className="text-bastion-sapphire" />
                          </div>
                          <span className="text-[11px] font-black uppercase tracking-[0.2em] leading-none">Audit Readiness Score</span>
                        </div>
                        
-                       <div className="flex-1 flex flex-col justify-center">
+                       <div className="flex-1 flex flex-col">
                           <div className="flex items-baseline gap-3 mb-2">
                             <span className="text-7xl font-light tracking-tighter text-white">94.2</span>
                             <span className="text-xs font-black text-bastion-green uppercase tracking-widest">+2.3% ▲</span>
                           </div>
                           <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.25em] mb-12">Institutional Stability Index</p>
                           
-                          <div className="space-y-6">
+                          <div className="space-y-8">
                             <AuditMetric label="Data Forensic Trace" value={98} />
                             <AuditMetric label="Identity Verifiability" value={91} />
                             <AuditMetric label="Model Drift Threshold" value={95} />
@@ -185,27 +187,30 @@ export default function App() {
                 <div className="h-px bg-gradient-to-r from-transparent via-bastion-border to-transparent" />
 
                 {/* TIER 3: Audit & Governance Zone */}
-                <section id="tier-3">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-                      <ShieldCheck size={16} />
+                <section id="tier-3" className="pt-12">
+                  <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-3">
+                      <div className="p-1.5 bg-slate-800 rounded">
+                        <Activity size={14} className="text-bastion-sapphire" />
+                      </div>
                       Regulatory Mapping Panel
                     </h2>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest italic">Updated: APR 28, 2026 19:12 UTC</span>
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-widest italic">Updated: APR 28, 2026 19:12 UTC</span>
                   </div>
-                  <RegulatoryMapping scores={COMPLIANCE_SCORES} />
+                  <RegulatoryMapping scores={COMPLIANCE_SCORES} onSelect={(f) => setSelectedFramework(f as any)} />
                 </section>
               </div>
             ) : (
               <SystemHealthDashboard />
             )}
           </div>
-          <Footer />
+          <Footer onSelect={setSelectedFramework} />
         </div>
       </main>
 
       <KillSwitchFlow isOpen={isKillSwitchOpen} onClose={() => setIsKillSwitchOpen(false)} />
       <Chat />
+      <RegulatoryContent framework={selectedFramework} onClose={() => setSelectedFramework(null)} />
     </div>
   );
 }

@@ -5,14 +5,25 @@ import { ComplianceScore } from '@/src/types';
 
 interface RegulatoryProps {
   scores: ComplianceScore[];
+  onSelect: (framework: string) => void;
 }
 
-export function RegulatoryMapping({ scores }: RegulatoryProps) {
+export function RegulatoryMapping({ scores, onSelect }: RegulatoryProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {scores.map((score) => (
-        <div key={score.framework} className="institutional-card p-6 group cursor-pointer hover:border-bastion-sapphire/30 transition-all flex flex-col bg-bastion-navy shadow-xl">
-          <div className="flex flex-col h-full">
+        <div 
+          key={score.framework} 
+          onClick={() => {
+            // Map the names to valid framework keys if needed
+            const frameworkMap: Record<string, string> = {
+              'AIDA (AI Act)': 'AIDA',
+              'SOC 2 Type II': 'SOC 2',
+            };
+            onSelect(frameworkMap[score.framework] || score.framework);
+          }}
+          className="institutional-card p-6 group cursor-pointer hover:border-bastion-sapphire/30 transition-all flex flex-col bg-bastion-navy shadow-xl active:scale-[0.98]"
+        >          <div className="flex flex-col h-full">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-bastion-navy-light rounded-lg border border-bastion-border">

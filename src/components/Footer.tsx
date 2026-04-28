@@ -1,7 +1,11 @@
 import React from 'react';
 import { Shield, ExternalLink, Globe, FileText, Lock, CheckCircle2 } from 'lucide-react';
 
-export function Footer() {
+interface FooterProps {
+  onSelect: (framework: any) => void;
+}
+
+export function Footer({ onSelect }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -26,11 +30,11 @@ export function Footer() {
         <div className="col-span-1">
           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Compliance Frameworks</h4>
           <ul className="space-y-3">
-            <RegulatoryItem label="OSFI E-21 (Operational Risk)" />
-            <RegulatoryItem label="PIPEDA (Data Privacy)" />
-            <RegulatoryItem label="AIDA (AI & Data Act)" />
-            <RegulatoryItem label="SOC 2 Type II" />
-            <RegulatoryItem label="ISO/IEC 42001 (AI Management)" />
+            <RegulatoryItem label="OSFI E-21 (Operational Risk)" onClick={() => onSelect('OSFI E-21')} />
+            <RegulatoryItem label="PIPEDA (Data Privacy)" onClick={() => onSelect('PIPEDA')} />
+            <RegulatoryItem label="AIDA (AI & Data Act)" onClick={() => onSelect('AIDA')} />
+            <RegulatoryItem label="SOC 2 Type II" onClick={() => onSelect('SOC 2')} />
+            <RegulatoryItem label="ISO/IEC 42001 (AI Management)" onClick={() => onSelect('ISO 42001')} />
           </ul>
         </div>
 
@@ -38,10 +42,10 @@ export function Footer() {
         <div className="col-span-1">
           <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Governance Resources</h4>
           <ul className="space-y-4">
-            <FooterLink label="Model Drift Analysis" />
-            <FooterLink label="Forensic Audit Trail Export" />
-            <FooterLink label="Hardware Vault Attestation" />
-            <FooterLink label="Incident Response Manual" />
+            <FooterLink label="Model Drift Analysis" onClick={() => onSelect('MODEL DRIFT')} />
+            <FooterLink label="Forensic Audit Trail Export" onClick={() => onSelect('FORENSIC')} />
+            <FooterLink label="Hardware Vault Attestation" onClick={() => onSelect('HARDWARE')} />
+            <FooterLink label="Incident Response Manual" onClick={() => onSelect('INCIDENT')} />
           </ul>
         </div>
 
@@ -78,18 +82,18 @@ export function Footer() {
   );
 }
 
-function RegulatoryItem({ label }: { label: string }) {
+function RegulatoryItem({ label, onClick }: { label: string, onClick: () => void }) {
   return (
-    <li className="flex items-center justify-between group cursor-pointer">
+    <li className="flex items-center justify-between group cursor-pointer" onClick={onClick}>
       <span className="text-[10px] font-bold text-slate-500 group-hover:text-slate-300 transition-colors uppercase tracking-tight">{label}</span>
       <ExternalLink size={10} className="text-slate-700 group-hover:text-bastion-sapphire transition-colors" />
     </li>
   );
 }
 
-function FooterLink({ label }: { label: string }) {
+function FooterLink({ label, onClick }: { label: string, onClick: () => void }) {
   return (
-    <li className="flex items-center gap-2 group cursor-pointer text-[10px] font-bold text-slate-500 uppercase tracking-tight hover:text-white transition-colors">
+    <li className="flex items-center gap-2 group cursor-pointer text-[10px] font-bold text-slate-500 uppercase tracking-tight hover:text-white transition-colors" onClick={onClick}>
       <FileText size={12} className="text-slate-700" />
       <span>{label}</span>
     </li>

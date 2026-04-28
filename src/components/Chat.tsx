@@ -12,6 +12,7 @@ export function Chat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [securityStatus, setSecurityStatus] = useState<'clean' | 'scanning' | 'alert' | 'idle'>('idle');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,8 +29,39 @@ export function Chat() {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setSecurityStatus('scanning');
 
     try {
+      // Step 1: Lakera Guard Security Scan
+      const securityResponse = await fetch('/api/security/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: input })
+      });
+
+      if (securityResponse.ok) {
+        const securityData = await securityResponse.json();
+        const isFlagged = securityData.results?.[0]?.flagged || securityData.results?.[0]?.flag;
+        
+        if (isFlagged) {
+          setSecurityStatus('alert');
+          const categories = securityData.results[0].categories;
+          const flaggedCategories = Object.entries(categories || {})
+            .filter(([_, value]) => value === true)
+            .map(([key]) => key.replace('_', ' ').toUpperCase());
+
+          setMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: `⚠️ SECURITY ALERT: Your message was flagged by Lakera Guard for potential ${flaggedCategories.join(', ') || 'security violations'}. Access denied to prevent institutional risk.` 
+          }]);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      setSecurityStatus('clean');
+
+      // Step 2: Proceed to Chat
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -54,16 +86,36 @@ export function Chat() {
     <>
       {/* Floating Toggle Button */}
       <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-8 right-8 z-[90] w-14 h-14 bg-bastion-sapphire rounded-2xl flex items-center justify-center shadow-[0_10px_40px_-10px_rgba(74,144,226,0.5)] border border-white/20 text-white"
+        className="fixed bottom-8 right-8 z-[90] w-16 h-16 bg-gradient-to-tr from-bastion-tangerine to-orange-400 rounded-2xl flex items-center justify-center shadow-[0_15px_50px_-10px_rgba(255,140,0,0.5)] border border-white/30 text-white group"
       >
-        {isOpen ? <X size={24} /> : <MessageSquare size={24} />}
+        <AnimatePresence mode="wait">
+          {isOpen ? (
+            <motion.div
+              key="close"
+              initial={{ rotate: -90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 90, opacity: 0 }}
+            >
+              <X size={28} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="message"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.5, opacity: 0 }}
+            >
+              <MessageSquare size={28} className="group-hover:animate-pulse" />
+            </motion.div>
+          )}
+        </AnimatePresence>
         {!isOpen && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-bastion-green opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-bastion-green"></span>
+          <span className="absolute -top-1 -right-1 flex h-5 w-5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-5 w-5 bg-bastion-green border-2 border-bastion-navy"></span>
           </span>
         )}
       </motion.button>
@@ -72,94 +124,151 @@ export function Chat() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 40, scale: 0.9, transformOrigin: 'bottom right' }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-28 right-8 z-[90] w-96 h-[500px] bg-bastion-navy border border-bastion-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            exit={{ opacity: 0, y: 40, scale: 0.9 }}
+            className="fixed bottom-28 right-8 z-[90] w-[400px] h-[600px] bg-bastion-navy border border-bastion-border rounded-3xl shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="p-4 border-b border-bastion-border bg-bastion-navy-light flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-bastion-sapphire/10 flex items-center justify-center border border-bastion-sapphire/30">
-                  <Bot size={18} className="text-bastion-sapphire" />
+            {/* Header with vibrant gradient */}
+            <div className="p-6 bg-gradient-to-r from-bastion-navy-light to-bastion-navy relative overflow-hidden">
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-bastion-tangerine via-bastion-gold to-bastion-green" />
+               <div className="absolute -right-8 -top-8 w-32 h-32 bg-bastion-tangerine/5 rounded-full blur-3xl" />
+               
+               <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-bastion-tangerine/10 flex items-center justify-center border border-bastion-tangerine/30 shadow-inner group overflow-hidden">
+                    <motion.div
+                      animate={{ 
+                        y: [0, -2, 0],
+                        rotate: [0, 5, -5, 0]
+                      }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                    >
+                      <Bot size={24} className="text-bastion-tangerine" />
+                    </motion.div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">Sentinel Assistant</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
+                        securityStatus === 'alert' ? 'bg-bastion-crimson' : 
+                        securityStatus === 'scanning' ? 'bg-bastion-gold' : 'bg-bastion-green'
+                      }`} />
+                      <p className={`text-[10px] font-bold uppercase tracking-widest ${
+                        securityStatus === 'alert' ? 'text-bastion-crimson' : 
+                        securityStatus === 'scanning' ? 'text-bastion-gold' : 'text-bastion-green'
+                      }`}>
+                        {securityStatus === 'alert' ? 'Threat Detected' : 
+                         securityStatus === 'scanning' ? 'Lakera Scanning...' : 
+                         'Lakera Secure Channel'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xs font-black uppercase tracking-widest text-white leading-none">Guard-GPT Assistant</h3>
-                  <p className="text-[9px] font-bold text-bastion-green uppercase tracking-widest mt-1">Sovereign Knowledge Engine</p>
+                <div className="flex gap-2">
+                  <button className="p-2 hover:bg-white/5 rounded-xl transition-colors text-slate-500 hover:text-white">
+                    <Sparkles size={16} />
+                  </button>
+                  <div className="p-2 bg-bastion-crimson/10 rounded-xl border border-bastion-crimson/20">
+                    <ShieldAlert size={16} className="text-bastion-crimson" />
+                  </div>
                 </div>
-              </div>
-              <div className="p-1.5 bg-bastion-crimson/10 rounded-lg border border-bastion-crimson/20">
-                <ShieldAlert size={14} className="text-bastion-crimson" />
               </div>
             </div>
 
-            {/* Messages Area */}
+            {/* Messages Area with refined styling */}
             <div 
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-bastion-navy/20"
+              className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-[radial-gradient(circle_at_bottom_right,_var(--tw-gradient-stops))] from-bastion-tangerine/5 via-transparent to-transparent"
             >
               {messages.length === 0 && (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
-                  <div className="p-4 bg-white/5 rounded-full border border-white/5">
-                    <Sparkles className="text-bastion-gold" size={32} />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-bold text-white uppercase tracking-widest">Audit Support Ready</p>
-                    <p className="text-[10px] text-slate-500 uppercase font-medium leading-relaxed">
-                      Ask about OSFI E-21 requirements, PII redaction rules, or threat mitigation strategies.
+                <div className="h-full flex flex-col items-center justify-center text-center p-8 space-y-6">
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="p-6 bg-bastion-tangerine/5 rounded-full border border-bastion-tangerine/20 shadow-[0_0_40px_rgba(255,140,0,0.1)]"
+                  >
+                    <Sparkles className="text-bastion-tangerine" size={40} />
+                  </motion.div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-black text-white uppercase tracking-[0.2em]">Institutional Guard Ready</p>
+                    <p className="text-xs text-slate-500 uppercase font-bold leading-relaxed tracking-wider">
+                      Inquire about OSFI E-21, PIPEDA Data residency, or automated threat mitigation workflows.
                     </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 w-full pt-4">
+                    {['OSFI E-21 Summary', 'PII Redaction Status', 'System Uptime', 'Compliance Gap'].map((hint) => (
+                      <button 
+                        key={hint}
+                        onClick={() => setInput(hint)}
+                        className="p-3 bg-white/5 border border-white/5 rounded-xl text-[10px] font-bold text-slate-400 hover:text-bastion-tangerine hover:border-bastion-tangerine/30 hover:bg-bastion-tangerine/5 transition-all text-left uppercase tracking-wider"
+                      >
+                        {hint}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
+              
               {messages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <motion.div 
+                  key={idx} 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
                   <div className={`
-                    max-w-[85%] p-3 rounded-xl text-xs leading-relaxed border
+                    max-w-[85%] p-4 rounded-2xl text-xs leading-relaxed shadow-xl
                     ${msg.role === 'user' 
-                      ? 'bg-bastion-sapphire/10 border-bastion-sapphire/30 text-white rounded-br-none' 
-                      : 'bg-black/40 border-bastion-border text-slate-300 rounded-bl-none'}
+                      ? 'bg-gradient-to-br from-bastion-tangerine to-orange-600 text-white rounded-br-none' 
+                      : 'bg-bastion-navy-light border border-bastion-border text-slate-300 rounded-bl-none'}
                   `}>
-                    <div className="flex items-center gap-2 mb-1 opacity-50">
-                      {msg.role === 'user' ? <User size={10} /> : <Bot size={10} />}
-                      <span className="text-[9px] font-bold uppercase tracking-widest">
-                        {msg.role === 'user' ? 'Audit Officer' : 'System Guard'}
+                    <div className="flex items-center gap-2 mb-2 opacity-60">
+                      {msg.role === 'user' ? <User size={12} /> : <Bot size={12} />}
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                        {msg.role === 'user' ? 'Direct Officer' : 'System Guard (Sovereign)'}
                       </span>
                     </div>
-                    <div className="whitespace-pre-wrap">{msg.content}</div>
+                    <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
                   </div>
-                </div>
+                </motion.div>
               ))}
+              
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-black/40 border border-bastion-border text-slate-300 p-3 rounded-xl rounded-bl-none">
-                    <Loader2 size={16} className="animate-spin text-bastion-sapphire" />
+                  <div className="bg-bastion-navy-light border border-bastion-border text-slate-300 p-4 rounded-2xl rounded-bl-none flex items-center gap-3">
+                    <Loader2 size={18} className="animate-spin text-bastion-tangerine" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Processing Inquiry...</span>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Input Area */}
-            <form onSubmit={handleSendMessage} className="p-4 border-t border-bastion-border bg-bastion-navy/50">
-              <div className="relative">
+            {/* Input Area with lively focus */}
+            <div className="p-6 bg-bastion-navy border-t border-bastion-border">
+              <form onSubmit={handleSendMessage} className="relative">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Inquire system status..."
-                  className="w-full bg-black/40 border border-bastion-border rounded-xl pl-4 pr-12 py-3 text-xs font-medium focus:outline-none focus:border-bastion-sapphire text-white placeholder:text-slate-700"
+                  placeholder="Ask Sentinel any compliance question..."
+                  className="w-full bg-black/40 border-2 border-bastion-border rounded-2xl pl-5 pr-14 py-4 text-xs font-bold focus:outline-none focus:border-bastion-tangerine focus:ring-4 focus:ring-bastion-tangerine/10 text-white placeholder:text-slate-700 transition-all"
                 />
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 bg-bastion-sapphire rounded-lg flex items-center justify-center text-white hover:scale-105 transition-all disabled:opacity-30"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 h-10 w-10 bg-bastion-tangerine rounded-xl flex items-center justify-center text-white hover:bg-orange-400 transition-all disabled:opacity-30 shadow-lg shadow-bastion-tangerine/20"
                 >
-                  <Send size={14} />
-                </button>
-              </div>
-            </form>
+                  <Send size={18} />
+                </motion.button>
+              </form>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
     </>
   );
 }

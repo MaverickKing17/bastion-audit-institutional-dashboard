@@ -4,6 +4,7 @@ import { Activity, Server, Database, Shield, Zap, Clock, AlertTriangle, CheckCir
 import { ComponentHealth, HealthMetric } from '@/src/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from './Common';
+import { clsx } from 'clsx';
 
 const INITIAL_COMPONENTS: ComponentHealth[] = [
   { name: 'Canadian Edge Gateway', status: 'OPERATIONAL', uptime: '99.98%', latency: 12, cpu: 15, memory: 28, lastPulse: 'Now', type: 'GATEWAY' },
@@ -14,9 +15,9 @@ const INITIAL_COMPONENTS: ComponentHealth[] = [
 ];
 
 const INCIDENT_LOGS = [
-  { time: '2026-04-28 14:12:01', comp: 'Vault-Primary', event: 'Token exhaustion warning on cluster-C', sev: 'HIGH', ref: 'HW-902' },
-  { time: '2026-04-28 11:45:22', comp: 'DB-Instance', event: 'Primary write-sharding rebalance', sev: 'MEDIUM', ref: 'DB-441' },
-  { time: '2026-04-28 09:20:11', comp: 'Lakera-Gate', event: 'Hardware-level bypass lock enabled', sev: 'CRITICAL', ref: 'SCR-110' },
+  { time: '2026-04-28 14:12:01', comp: 'Encryption Vault', event: 'Token exhaustion warning on cluster-C', sev: 'HIGH', ref: 'HW-902' },
+  { time: '2026-04-28 11:45:22', comp: 'Firestore DB', event: 'Primary write-sharding rebalance', sev: 'MEDIUM', ref: 'DB-441' },
+  { time: '2026-04-28 09:20:11', comp: 'Lakera Guard', event: 'Hardware-level bypass lock enabled', sev: 'CRITICAL', ref: 'SCR-110' },
 ];
 
 function ConnectionLine({ 
@@ -30,25 +31,32 @@ function ConnectionLine({
 }) {
   const isOnline = status !== 'OUTAGE';
   const isDegraded = status === 'DEGRADED';
+  const isHighLatency = latency > 30;
   
-  const strokeColor = !isOnline ? '#ef4444' : isDegraded ? '#d4af37' : '#2ecc71';
-  const pulseDuration = !isOnline ? 0 : Math.max(0.5, latency / 50);
+  const strokeColor = !isOnline ? '#ef4444' : (isDegraded || isHighLatency) ? '#d4af37' : '#2ecc71';
+  const pulseDuration = !isOnline ? 0 : Math.max(0.3, latency / 50);
 
   return (
     <svg className={`absolute inset-0 w-8 h-full -left-4 pointer-events-none z-0 ${className}`}>
       <motion.path
         d="M 16 0 L 16 48" // matches the container h-12 (48px)
         stroke={strokeColor}
-        strokeWidth="2"
-        strokeDasharray="4 4"
+        strokeWidth={isHighLatency ? "3" : "2"}
+        strokeDasharray={isHighLatency ? "2 2" : "4 4"}
         fill="transparent"
         initial={{ opacity: 0.1 }}
-        animate={{ opacity: isOnline ? [0.1, 0.4, 0.1] : 0.05 }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={{ 
+          opacity: isOnline ? [0.1, 0.4, 0.1] : 0.05,
+          x: isHighLatency ? [0.5, -0.5, 0.5] : 0
+        }}
+        transition={{ 
+          opacity: { duration: 2, repeat: Infinity },
+          x: { duration: 0.1, repeat: Infinity, ease: "linear" }
+        }}
       />
       {isOnline && (
         <motion.circle
-          r="3"
+          r={isHighLatency ? "4" : "3"}
           fill={strokeColor}
           initial={{ cy: 0 }}
           animate={{ cy: 48 }}
@@ -100,6 +108,7 @@ function ComponentStatusBadge({ status }: { status: ComponentHealth['status'] })
 export function SystemHealthDashboard() {
   const [components, setComponents] = useState<ComponentHealth[]>(INITIAL_COMPONENTS);
   const [expandedNode, setExpandedNode] = useState<string | null>(null);
+  const [hoveredCompFromLog, setHoveredCompFromLog] = useState<string | null>(null);
   const [latencyData, setLatencyData] = useState<HealthMetric[]>(() => 
     Array.from({ length: 20 }, (_, i) => ({
       timestamp: `${i}:00`,
@@ -233,6 +242,8 @@ export function SystemHealthDashboard() {
                 <NodeCard 
                   node={node} 
                   isExpanded={expandedNode === node.name}
+                  isCorrelated={hoveredCompFromLog === node.name}
+                  hasIncident={INCIDENT_LOGS.some(log => log.comp === node.name && log.sev === 'CRITICAL' || log.sev === 'HIGH')}
                   onClick={() => setExpandedNode(expandedNode === node.name ? null : node.name)}
                 />
               </div>
@@ -328,7 +339,15 @@ export function SystemHealthDashboard() {
             </thead>
             <tbody className="divide-y divide-white/5">
               {INCIDENT_LOGS.map((log, i) => (
-                <tr key={i} className="hover:bg-white/5 transition-colors">
+                <tr 
+                  key={i} 
+                  className={clsx(
+                    "hover:bg-white/5 transition-colors cursor-default",
+                    hoveredCompFromLog === log.comp ? "bg-bastion-sapphire/5" : ""
+                  )}
+                  onMouseEnter={() => setHoveredCompFromLog(log.comp)}
+                  onMouseLeave={() => setHoveredCompFromLog(null)}
+                >
                   <td className="px-6 py-4 font-normal text-slate-500">{log.time}</td>
                   <td className="px-6 py-4 font-bold text-white uppercase">{log.comp}</td>
                   <td className="px-6 py-4 text-slate-400">{log.event}</td>
@@ -351,7 +370,13 @@ export function SystemHealthDashboard() {
   );
 }
 
-function NodeCard({ node, isExpanded, onClick }: { node: ComponentHealth, isExpanded: boolean, onClick: () => void }) {
+function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick }: { 
+  node: ComponentHealth, 
+  isExpanded: boolean, 
+  isCorrelated?: boolean,
+  hasIncident?: boolean,
+  onClick: () => void 
+}) {
   const statusColors = {
     OPERATIONAL: { border: 'border-bastion-green/20', iconColor: 'text-bastion-green', shadow: 'shadow-[0_0_15px_rgba(46,204,113,0.1)]' },
     DEGRADED: { border: 'border-bastion-gold/20', iconColor: 'text-bastion-gold', shadow: 'shadow-[0_0_15px_rgba(212,175,55,0.1)]' },
@@ -364,8 +389,24 @@ function NodeCard({ node, isExpanded, onClick }: { node: ComponentHealth, isExpa
     <motion.div 
       layout
       onClick={onClick}
-      className={`institutional-card p-5 group hover:border-bastion-sapphire/30 transition-all cursor-pointer relative overflow-hidden ${currentStatus.shadow} ${isExpanded ? 'ring-1 ring-bastion-sapphire/50 bg-bastion-navy-light' : ''}`}
+      animate={{ 
+        scale: isCorrelated ? 1.02 : 1,
+        borderColor: isCorrelated ? 'rgba(74, 144, 226, 0.5)' : undefined
+      }}
+      className={clsx(
+        "institutional-card p-5 group hover:border-bastion-sapphire/30 transition-all cursor-pointer relative overflow-hidden",
+        currentStatus.shadow,
+        isExpanded ? 'ring-1 ring-bastion-sapphire/50 bg-bastion-navy-light' : '',
+        isCorrelated ? 'border-bastion-sapphire bg-bastion-sapphire/5 shadow-[0_0_20px_rgba(74,144,226,0.15)]' : '',
+        hasIncident && !isCorrelated ? 'border-bastion-gold/10' : ''
+      )}
     >
+      {hasIncident && (
+        <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-bastion-gold/10 border border-bastion-gold/20 animate-pulse">
+          <AlertTriangle size={8} className="text-bastion-gold" />
+          <span className="text-[7px] font-black text-bastion-gold uppercase tracking-[0.2em]">Active Incident</span>
+        </div>
+      )}
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
           <motion.div layout className={`p-2 rounded-lg bg-bastion-navy border ${currentStatus.border}`}>
