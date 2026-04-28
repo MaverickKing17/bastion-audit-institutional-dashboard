@@ -1,10 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, MessageSquare, X, Bot, User, Loader2, Sparkles, ShieldAlert } from 'lucide-react';
+import { Send, MessageSquare, X, Bot, User, Loader2, Sparkles, ShieldAlert, AlertTriangle, Terminal, ShieldOff, EyeOff, Lock, Skull, Link2Off, FileWarning, ShieldCheck } from 'lucide-react';
+
+interface SecurityMetadata {
+  isFlagged: boolean;
+  flaggedCategories: string[];
+}
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  securityMetadata?: SecurityMetadata;
 }
 
 export function Chat() {
@@ -48,11 +54,15 @@ export function Chat() {
           const categories = securityData.results[0].categories;
           const flaggedCategories = Object.entries(categories || {})
             .filter(([_, value]) => value === true)
-            .map(([key]) => key.replace('_', ' ').toUpperCase());
+            .map(([key]) => key);
 
           setMessages(prev => [...prev, { 
             role: 'assistant', 
-            content: `⚠️ SECURITY ALERT: Your message was flagged by Lakera Guard for potential ${flaggedCategories.join(', ') || 'security violations'}. Access denied to prevent institutional risk.` 
+            content: `Access denied due to institutional risk. Lakera Guard has intercepted this transmission.`,
+            securityMetadata: {
+              isFlagged: true,
+              flaggedCategories: flaggedCategories
+            }
           }]);
           setIsLoading(false);
           return;
@@ -201,7 +211,7 @@ export function Chat() {
                       <button 
                         key={hint}
                         onClick={() => setInput(hint)}
-                        className="p-3 bg-white/5 border border-white/5 rounded-xl text-[10px] font-bold text-slate-400 hover:text-bastion-tangerine hover:border-bastion-tangerine/30 hover:bg-bastion-tangerine/5 transition-all text-left uppercase tracking-wider"
+                        className="p-3 bg-bastion-navy border border-bastion-border rounded-xl text-[10px] font-black text-slate-500 hover:text-white hover:border-bastion-tangerine/30 hover:bg-bastion-tangerine/5 transition-all text-left uppercase tracking-wider"
                       >
                         {hint}
                       </button>
@@ -220,7 +230,7 @@ export function Chat() {
                   <div className={`
                     max-w-[85%] p-4 rounded-2xl text-xs leading-relaxed shadow-xl
                     ${msg.role === 'user' 
-                      ? 'bg-gradient-to-br from-bastion-tangerine to-orange-600 text-white rounded-br-none' 
+                      ? 'bg-gradient-to-br from-bastion-tangerine to-orange-600 text-white rounded-br-none shadow-bastion-tangerine/20' 
                       : 'bg-bastion-navy-light border border-bastion-border text-slate-300 rounded-bl-none'}
                   `}>
                     <div className="flex items-center gap-2 mb-2 opacity-60">
@@ -229,7 +239,46 @@ export function Chat() {
                         {msg.role === 'user' ? 'Direct Officer' : 'System Guard (Sovereign)'}
                       </span>
                     </div>
-                    <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
+                    {msg.securityMetadata?.isFlagged ? (
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-3 p-3 bg-bastion-crimson/10 border border-bastion-crimson/20 rounded-xl">
+                          <AlertTriangle className="text-bastion-crimson shrink-0" size={18} />
+                          <div>
+                            <p className="text-[11px] font-black uppercase tracking-widest text-bastion-crimson mb-1">Institutional Risk Detected</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-relaxed">
+                              {msg.content}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Violation Vector Analysis:</p>
+                          <div className="grid grid-cols-1 gap-2">
+                            {msg.securityMetadata.flaggedCategories.map((cat) => (
+                              <div key={cat} className="flex items-center gap-3 p-2 bg-bastion-navy/50 border border-white/5 rounded-lg">
+                                <SecurityCategoryIcon category={cat} />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-300">
+                                  {cat.replace('_', ' ')}
+                                </span>
+                                <div className="ml-auto flex items-center gap-1">
+                                   <div className="w-1.5 h-1.5 rounded-full bg-bastion-crimson shadow-[0_0_8px_rgba(229,72,77,0.5)]" />
+                                   <span className="text-[8px] font-black text-bastion-crimson uppercase tracking-tighter">FLAGGED</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-white/5">
+                           <div className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase italic">
+                             <ShieldCheck size={10} className="text-bastion-green" />
+                             Protected by Bastion Sovereign Protocol v4.1
+                           </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -252,7 +301,7 @@ export function Chat() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask Sentinel any compliance question..."
-                  className="w-full bg-black/40 border-2 border-bastion-border rounded-2xl pl-5 pr-14 py-4 text-xs font-bold focus:outline-none focus:border-bastion-tangerine focus:ring-4 focus:ring-bastion-tangerine/10 text-white placeholder:text-slate-700 transition-all"
+                  className="w-full bg-bastion-navy-light border-2 border-bastion-border rounded-2xl pl-5 pr-14 py-4 text-xs font-black focus:outline-none focus:border-bastion-tangerine focus:ring-4 focus:ring-bastion-tangerine/10 text-white placeholder:text-slate-700 transition-all shadow-inner shadow-black/20"
                 />
                 <motion.button
                   whileHover={{ scale: 1.1 }}
@@ -271,4 +320,29 @@ export function Chat() {
 
     </>
   );
+}
+
+function SecurityCategoryIcon({ category }: { category: string }) {
+  const iconSize = 14;
+  const className = "text-bastion-crimson";
+  
+  switch (category.toLowerCase()) {
+    case 'prompt_injection':
+      return <Terminal size={iconSize} className={className} />;
+    case 'jailbreak':
+      return <Lock size={iconSize} className={className} />;
+    case 'pii':
+      return <FileWarning size={iconSize} className={className} />;
+    case 'unknown_links':
+      return <Link2Off size={iconSize} className={className} />;
+    case 'sexual':
+      return <EyeOff size={iconSize} className={className} />;
+    case 'hate':
+      return <Skull size={iconSize} className={className} />;
+    case 'violence':
+    case 'harassment':
+      return <ShieldOff size={iconSize} className={className} />;
+    default:
+      return <ShieldAlert size={iconSize} className={className} />;
+  }
 }

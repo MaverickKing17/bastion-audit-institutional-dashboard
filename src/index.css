@@ -5,44 +5,49 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-bastion-navy: #05070A;
-  --color-bastion-navy-light: #0B1221;
-  --color-bastion-crimson: #AF292F;
-  --color-bastion-gold: #D4AF37;
-  --color-bastion-sapphire: #4A90E2;
-  --color-bastion-green: #2ECC71;
-  --color-bastion-tangerine: #FF8C00;
-  --color-bastion-border: rgba(255, 255, 255, 0.08);
-  --color-bastion-border-dim: rgba(255, 255, 255, 0.03);
-  --color-bastion-bg-accent: rgba(74, 144, 226, 0.02);
+  /* Sovereign Dark System - Institutional Design Framework */
+  --color-bastion-navy: #0B1221;         /* Primary Background */
+  --color-bastion-navy-light: #0F1A2F;   /* Secondary Background (Panels) */
+  --color-bastion-surface: #13203A;     /* Tertiary Surface (Cards/Tables) */
+  --color-bastion-elevated: #182843;    /* Elevated Surface (Modals) */
+  
+  --color-bastion-crimson: #E5484D;      /* Muted Severity Critical */
+  --color-bastion-gold: #D4A017;         /* Regulatory Gold */
+  --color-bastion-sapphire: #3E7BFA;      /* Intelligence Blue */
+  --color-bastion-green: #1FA971;        /* Sovereign Green */
+  --color-bastion-tangerine: #F08C00;    /* Severity High */
+  
+  --color-bastion-border: #22314D;       /* Standard Border */
+  --color-bastion-border-dim: #1A2740;   /* Subtle Divider */
+  
+  --color-text-primary: #E6EDF7;         /* Soft Off-White */
+  --color-text-secondary: #9FB0C8;       /* Meta Information */
+  --color-text-muted: #6C7C96;           /* Timestamps/Low Priority */
 
   @keyframes spin-slow {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
   }
-  --animate-spin-slow: spin-slow 8s linear infinite;
+  --animate-spin-slow: spin-slow 12s linear infinite;
 }
 
 @layer base {
   body {
-    @apply bg-bastion-navy text-slate-100 antialiased selection:bg-bastion-crimson/30;
-    background-image: 
-      radial-gradient(circle at 50% 0%, rgba(74, 144, 226, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 100% 100%, rgba(175, 41, 47, 0.03) 0%, transparent 50%);
-    background-attachment: fixed;
+    @apply bg-bastion-navy text-[var(--color-text-primary)] antialiased selection:bg-bastion-sapphire/30;
+    background-image: none; /* Removing gradients for zero-hype institutional feel */
   }
 }
 
 @layer components {
   .institutional-card {
-    @apply bg-bastion-navy-light/40 backdrop-blur-md border border-bastion-border rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300;
+    @apply bg-bastion-surface border border-bastion-border rounded-xl transition-all duration-300;
   }
   
   .terminal-text {
-    @apply font-mono text-[12px] leading-relaxed tracking-tight text-white/90;
+    @apply font-mono text-[12px] leading-relaxed tracking-tight text-[var(--color-text-primary)]/90;
   }
 
   .label-xs {
-    @apply text-[10px] font-black uppercase tracking-[0.2em] text-white/40;
+    @apply text-[10px] font-black uppercase tracking-[0.2em] text-[var(--color-text-muted)];
   }
 }

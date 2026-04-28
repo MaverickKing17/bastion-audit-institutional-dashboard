@@ -61,24 +61,37 @@ async function startServer() {
         });
       }
 
-      // We'll use the v1/guard endpoint for multi-category analysis
-      const response = await fetch('https://api.lakera.ai/v1/guard', {
+      // Use prompt_injection endpoint for broader availability and reliability
+      // We transform the response to match the 'results' structure expected by Chat.tsx
+      const response = await fetch('https://api.lakera.ai/v1/prompt_injection', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          input: input, // Array of message objects or single string
+          input: input,
         })
       });
 
       if (!response.ok) {
+        // If prompt_injection also fails with 404, the path is definitively different
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error?.message || `Lakera API returned ${response.status}`);
       }
 
-      const data = await response.json();
+      const rawData: any = await response.json();
+      
+      // Transform to the structure expected by the client: { results: [{ flag, categories: { ... } }] }
+      const data = {
+        results: [{
+          flag: rawData.flagged || false,
+          categories: {
+            prompt_injection: rawData.flagged || false
+          }
+        }]
+      };
+      
       res.json(data);
     } catch (error: any) {
       console.error('Lakera Guard API Proxy Error:', error);

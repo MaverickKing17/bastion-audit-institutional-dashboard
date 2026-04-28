@@ -236,7 +236,7 @@ export function RegulatoryContent({ framework, onClose }: Props) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+          className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
         />
 
         {/* Modal */}
@@ -244,13 +244,13 @@ export function RegulatoryContent({ framework, onClose }: Props) {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-2xl bg-bastion-navy border border-bastion-border rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
+          className="relative w-full max-w-2xl bg-bastion-navy-light border border-bastion-border rounded-2xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]"
         >
           {/* Header */}
-          <div className="p-8 border-b border-bastion-border bg-bastion-navy-light flex items-center justify-between">
+          <div className="p-8 border-b border-bastion-border bg-bastion-navy/30 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className={clsx("p-3 rounded-xl border", content.color.replace('text-', 'border-').replace('text-', 'bg-').concat('/10'))}>
-                <Icon size={24} className={content.color} />
+              <div className={clsx("p-3 rounded-xl border border-bastion-sapphire/20 bg-bastion-sapphire/5")}>
+                <Icon size={24} className="text-bastion-sapphire" />
               </div>
               <div>
                 <h2 className="text-xl font-black text-white uppercase tracking-tight">{content.title}</h2>
@@ -259,7 +259,7 @@ export function RegulatoryContent({ framework, onClose }: Props) {
             </div>
             <button 
               onClick={onClose}
-              className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-400 hover:text-white"
+              className="p-2 hover:bg-white/5 rounded-lg transition-colors text-slate-500 hover:text-white"
             >
               <X size={20} />
             </button>
@@ -267,12 +267,12 @@ export function RegulatoryContent({ framework, onClose }: Props) {
 
           {/* Content */}
           <div className="p-8 overflow-y-auto custom-scrollbar">
-            <div className="text-slate-300 leading-8 text-sm whitespace-pre-line font-medium italic mb-8 border-l-2 border-bastion-sapphire/30 pl-6">
+            <div className="text-slate-500 leading-8 text-sm whitespace-pre-line font-black italic mb-8 border-l-2 border-bastion-sapphire/30 pl-6">
               Official Institutional Guidance // Bastion Audit v4.1
             </div>
 
-            <div className="prose prose-invert max-w-none">
-              <div className="text-slate-300 leading-relaxed text-sm space-y-4">
+            <div className="max-w-none">
+              <div className="text-slate-400 leading-relaxed text-sm space-y-4 font-medium">
                 {content.content.split('\n\n').map((paragraph, i) => {
                   if (paragraph.startsWith('-')) {
                     return (
@@ -291,7 +291,7 @@ export function RegulatoryContent({ framework, onClose }: Props) {
               </div>
             </div>
 
-            <div className="mt-12 p-6 bg-bastion-navy-light/50 border border-bastion-border rounded-xl flex items-center justify-between">
+            <div className="mt-12 p-6 bg-bastion-navy/30 border border-bastion-border rounded-xl flex items-center justify-between">
               <div>
                 <p className="text-[10px] font-black text-white uppercase tracking-widest mb-1">Compliance Readiness</p>
                 <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Calculated via Sovereign AI Engine</p>
@@ -303,7 +303,7 @@ export function RegulatoryContent({ framework, onClose }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="p-4 bg-black/20 border-t border-bastion-border text-center">
+          <div className="p-4 bg-bastion-navy-light border-t border-bastion-border text-center">
             <p className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.3em]">
               Authorized Use Only • Canadian Financial Sector Sentinel
             </p>

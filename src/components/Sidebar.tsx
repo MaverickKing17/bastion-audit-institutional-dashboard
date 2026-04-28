@@ -13,27 +13,27 @@ function NavItem({ active, onClick, icon, label }: { active: boolean, onClick: (
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
         active 
-        ? 'bg-bastion-sapphire/10 border border-bastion-sapphire/30 text-white' 
-        : 'hover:bg-white/5 border border-transparent text-white/40'
+        ? 'bg-bastion-sapphire/5 border border-bastion-sapphire/20 text-bastion-sapphire shadow-sm' 
+        : 'hover:bg-white/5 border border-transparent text-slate-500'
       }`}
     >
       <span className={active ? 'text-bastion-sapphire' : ''}>{icon}</span>
-      <span className={`text-xs font-bold uppercase tracking-tight ${active ? 'text-white' : ''}`}>{label}</span>
-      {active && <div className="ml-auto w-1 h-1 rounded-full bg-bastion-sapphire shadow-[0_0_8px_rgba(74,144,226,0.8)]" />}
+      <span className={`text-xs font-black uppercase tracking-tight ${active ? 'text-[var(--color-text-primary)]' : 'text-slate-500'}`}>{label}</span>
+      {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-bastion-sapphire shadow-[0_0_8px_rgba(62,123,250,0.3)]" />}
     </button>
   );
 }
 
 export function Sidebar({ currentView, onViewChange, onSelectFramework }: SidebarProps) {
   return (
-    <div className="w-72 border-r border-bastion-border bg-bastion-navy p-6 flex flex-col gap-8">
+    <div className="w-72 border-r border-bastion-border bg-bastion-navy-light p-6 flex flex-col gap-8">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 bg-bastion-green rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(46,204,113,0.2)] border border-white/10">
-          <Shield fill="#05070A" className="text-white" size={24} />
+        <div className="w-10 h-10 bg-bastion-green rounded-lg flex items-center justify-center shadow-sm border border-white/5">
+          <Shield fill="#0F1A2F" className="text-white" size={24} />
         </div>
         <div>
           <h1 className="font-black text-lg leading-none tracking-tight text-white mb-0.5 uppercase italic">Bastion Audit</h1>
-          <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none">Enterprise Security Gateway</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Enterprise Security Gateway</p>
         </div>
       </div>
 
@@ -55,14 +55,14 @@ export function Sidebar({ currentView, onViewChange, onSelectFramework }: Sideba
 
       <div className="space-y-1">
         <label className="label-xs mb-3 block">Tenant Context</label>
-        <div className="p-3 bg-bastion-navy-light/50 rounded-xl border border-bastion-border group cursor-pointer hover:border-bastion-sapphire/30 transition-all">
+        <div className="p-3 bg-bastion-navy/40 rounded-xl border border-bastion-border group cursor-pointer hover:border-bastion-sapphire/30 transition-all">
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 rounded-lg bg-bastion-navy border border-white/5 flex items-center justify-center">
+             <div className="w-8 h-8 rounded-lg bg-bastion-surface border border-bastion-border flex items-center justify-center shadow-sm">
                <Globe className="text-bastion-sapphire" size={14} />
              </div>
              <div>
                <p className="text-[11px] font-bold text-white uppercase tracking-tight">Global Enterprise</p>
-               <p className="text-[9px] text-white/40 uppercase font-bold">14 Active Agents</p>
+               <p className="text-[9px] text-slate-500 uppercase font-black">14 Active Agents</p>
              </div>
           </div>
         </div>
@@ -70,7 +70,7 @@ export function Sidebar({ currentView, onViewChange, onSelectFramework }: Sideba
 
       <div className="space-y-4">
         <label className="label-xs mb-1 block">Governance</label>
-        <button className="w-full flex items-center gap-3 p-2.5 text-[10px] font-bold text-white/50 bg-white/5 border border-white/5 rounded-lg hover:bg-white/10 hover:text-white transition-all group uppercase tracking-widest">
+        <button className="w-full flex items-center gap-3 p-2.5 text-[10px] font-black text-slate-500 bg-bastion-navy border border-bastion-border rounded-lg hover:bg-bastion-surface hover:text-white transition-all group uppercase tracking-widest">
           <Lock size={12} className="group-hover:text-bastion-crimson" />
           <span>Privileges Locked</span>
         </button>
@@ -80,15 +80,15 @@ export function Sidebar({ currentView, onViewChange, onSelectFramework }: Sideba
         <label className="label-xs mb-1 block">Residency</label>
         <div className="space-y-2 px-1">
           <div className="flex justify-between items-center text-[10px]">
-            <span className="text-white/40 uppercase font-black tracking-tight">Primary</span>
-            <span className="text-white font-bold uppercase tracking-tight flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-bastion-green animate-pulse" />
+            <span className="text-slate-500 uppercase font-bold tracking-tight">Primary</span>
+            <span className="text-white font-black uppercase tracking-tight flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-bastion-green animate-pulse" />
               CA-CENTRAL
             </span>
           </div>
           <div className="flex justify-between items-center text-[10px] group cursor-pointer" onClick={() => onSelectFramework('OSFI E-21')}>
-            <span className="text-white/40 uppercase font-black tracking-tight group-hover:text-slate-300 transition-colors">Compliance</span>
-            <span className="text-bastion-green font-bold uppercase tracking-tight group-hover:brightness-110 transition-all">E-21 Verified</span>
+            <span className="text-slate-500 uppercase font-bold tracking-tight group-hover:text-slate-400 transition-colors">Compliance</span>
+            <span className="text-bastion-green font-black uppercase tracking-tight group-hover:brightness-110 transition-all">E-21 Verified</span>
           </div>
         </div>
       </div>
@@ -108,10 +108,10 @@ export function Sidebar({ currentView, onViewChange, onSelectFramework }: Sideba
 function StatusRow({ label, status, dot }: { label: string, status: string, dot: string }) {
   return (
     <div className="flex justify-between items-center text-[11px]">
-      <span className="text-white/40 uppercase font-black tracking-tighter">{label}</span>
+      <span className="text-slate-400 uppercase font-bold tracking-tighter">{label}</span>
       <span className={`font-black text-[10px] uppercase tracking-wider flex items-center gap-2 ${dot === 'bg-bastion-green' ? 'text-bastion-green' : 'text-bastion-sapphire'}`}>
         {status}
-        <span className={`w-1.5 h-1.5 rounded-full ${dot} shadow-[0_0_8px_rgba(46,204,113,0.5)]`} />
+        <span className={`w-1.5 h-1.5 rounded-full ${dot} shadow-sm`} />
       </span>
     </div>
   );

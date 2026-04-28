@@ -37,7 +37,7 @@ export function SeverityBadge({ severity }: { severity: Severity }) {
 
 export function RegulatoryBadge({ code }: { code: string }) {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
+    <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">
       {code}
     </span>
   );
@@ -52,9 +52,9 @@ export function Card({ children, title, subtitle, className, ...props }: { child
       {...props}
     >
       {(title || subtitle) && (
-        <div className="px-6 py-4 border-b border-bastion-border/50 bg-bastion-navy/20">
-          {title && <h3 className="label-xs text-slate-400">{title}</h3>}
-          {subtitle && <p className="text-[11px] text-slate-500 mt-0.5 lowercase font-medium tracking-tight overflow-hidden text-ellipsis whitespace-nowrap">{subtitle}</p>}
+        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          {title && <h3 className="label-xs text-slate-500">{title}</h3>}
+          {subtitle && <p className="text-[11px] text-slate-400 mt-0.5 lowercase font-black tracking-tight overflow-hidden text-ellipsis whitespace-nowrap">{subtitle}</p>}
         </div>
       )}
       <div className="flex-1 p-6">

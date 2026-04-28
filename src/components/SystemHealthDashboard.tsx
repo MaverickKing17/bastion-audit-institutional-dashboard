@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Activity, Server, Database, Shield, Zap, Clock, AlertTriangle, CheckCircle2, ChevronRight, BarChart3, RefreshCcw, Download } from 'lucide-react';
+import { Activity, Server, Database, Shield, Zap, Clock, AlertTriangle, CheckCircle2, ChevronRight, BarChart3, RefreshCcw, Download, X } from 'lucide-react';
 import { ComponentHealth, HealthMetric } from '@/src/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from './Common';
@@ -315,8 +315,8 @@ export function SystemHealthDashboard() {
                     domain={[0, 'auto']}
                   />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#161F30', border: '1px solid #1E293B', borderRadius: '8px', fontSize: '12px' }}
-                    itemStyle={{ color: '#F1F5F9' }}
+                    contentStyle={{ backgroundColor: '#0B1221', border: '1px solid #22314D', borderRadius: '8px', fontSize: '12px', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                    itemStyle={{ color: '#E6EDF7' }}
                   />
                   <Area 
                     type="monotone" 
@@ -391,7 +391,7 @@ export function SystemHealthDashboard() {
                       {log.sev}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right text-slate-600 uppercase">SYS-{log.ref}</td>
+                  <td className="px-6 py-4 text-right text-slate-500 uppercase">SYS-{log.ref}</td>
                 </tr>
               ))}
             </tbody>
@@ -466,7 +466,7 @@ function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick, onView
         </div>
         <div className="text-right">
           <motion.p layout className="text-xs font-mono font-bold text-white">{node.uptime}</motion.p>
-          <motion.p layout className="text-[9px] text-slate-600 uppercase font-bold tracking-widest mt-0.5">UPTIME</motion.p>
+          <motion.p layout className="text-[9px] text-slate-500 uppercase font-bold tracking-widest mt-0.5">UPTIME</motion.p>
         </div>
       </div>
 
@@ -474,8 +474,8 @@ function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick, onView
         <ResourceGauge label="CPU Usage" value={node.cpu} color="bg-bastion-sapphire" />
         <ResourceGauge label="RAM Load" value={node.memory} color="bg-bastion-gold" />
         <div className="space-y-1">
-          <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Latency</p>
-          <p className="text-xs font-mono font-bold text-slate-300">{node.latency}ms</p>
+          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Latency</p>
+          <p className="text-xs font-mono font-bold text-slate-400">{node.latency}ms</p>
         </div>
       </motion.div>
 
@@ -489,12 +489,12 @@ function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick, onView
             className="pt-6 mt-6 border-t border-white/5 space-y-4"
           >
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-black/20 rounded-lg border border-white/5">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Provisioned Region</p>
-                <p className="text-[11px] font-black text-white uppercase">ca-central-1 (Montreal)</p>
+              <div className="p-3 bg-bastion-navy rounded-lg border border-bastion-border">
+                <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Provisioned Region</p>
+                <p className="text-[11px] font-black text-slate-300 uppercase">ca-central-1 (Montreal)</p>
               </div>
-              <div className="p-3 bg-black/20 rounded-lg border border-white/5">
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Encryption Mode</p>
+              <div className="p-3 bg-bastion-navy rounded-lg border border-bastion-border">
+                <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Encryption Mode</p>
                 <p className="text-[11px] font-black text-bastion-green uppercase">FIPS 140-2 L3</p>
               </div>
             </div>
@@ -555,19 +555,19 @@ function DetailedMetricsModal({ node, onClose }: { node: ComponentHealth, onClos
         className="w-full max-w-4xl bg-bastion-navy border border-bastion-border rounded-2xl shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        <div className="px-8 py-6 border-b border-bastion-border flex items-center justify-between bg-bastion-navy-light/50">
+        <div className="px-8 py-6 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-bastion-sapphire/10 border border-bastion-sapphire/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-bastion-sapphire/5 border border-bastion-sapphire/20 flex items-center justify-center">
               <BarChart3 className="text-bastion-sapphire" size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-black text-white uppercase tracking-tight">{node.name}</h2>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Historical Performance Diagnostics // 24H Window</p>
+              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">{node.name}</h2>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Historical Performance Diagnostics // 24H Window</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 hover:bg-white/5 rounded-full text-slate-500 hover:text-white transition-colors"
+            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-colors"
           >
             <X size={20} />
           </button>
@@ -576,16 +576,16 @@ function DetailedMetricsModal({ node, onClose }: { node: ComponentHealth, onClos
         <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
           {/* Summary Mini Stats */}
           <div className="grid grid-cols-3 gap-6">
-            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Peak CPU Load</p>
-              <p className="text-xl font-light text-white tracking-tighter">{Math.max(...data.map(d => d.cpu)).toFixed(1)}%</p>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Peak CPU Load</p>
+              <p className="text-xl font-light text-slate-900 tracking-tighter">{Math.max(...data.map(d => d.cpu)).toFixed(1)}%</p>
             </div>
-            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Avg Memory State</p>
-              <p className="text-xl font-light text-white tracking-tighter">{(data.reduce((acc, d) => acc + d.memory, 0) / data.length).toFixed(1)}%</p>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Memory State</p>
+              <p className="text-xl font-light text-slate-900 tracking-tighter">{(data.reduce((acc, d) => acc + d.memory, 0) / data.length).toFixed(1)}%</p>
             </div>
-            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Latency Variance</p>
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Latency Variance</p>
               <p className="text-xl font-light text-bastion-gold tracking-tighter">±4.2ms</p>
             </div>
           </div>
@@ -595,8 +595,8 @@ function DetailedMetricsModal({ node, onClose }: { node: ComponentHealth, onClos
           <MetricGraph title="Latency Signature (ms)" data={data} lines={[{ key: 'latency', color: '#2ecc71', name: 'Latency' }]} unit="ms" />
         </div>
 
-        <div className="px-8 py-4 bg-bastion-navy-light/30 border-t border-bastion-border flex justify-between items-center">
-          <span className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">Sovereign Hardware Monitor v4.1 // Real-time Feed Active</span>
+        <div className="px-8 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Sovereign Hardware Monitor v4.1 // Real-time Feed Active</span>
           <button onClick={onClose} className="px-6 py-2 bg-bastion-sapphire text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 transition-colors">
             Close Diagnostics
           </button>
@@ -609,8 +609,8 @@ function DetailedMetricsModal({ node, onClose }: { node: ComponentHealth, onClos
 function MetricGraph({ title, data, lines, unit }: { title: string, data: any[], lines: { key: string, color: string, name: string }[], unit: string }) {
   return (
     <div className="space-y-4">
-      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{title}</h3>
-      <div className="h-[200px] w-full bg-white/[0.01] border border-white/[0.03] rounded-xl p-4">
+      <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">{title}</h3>
+      <div className="h-[200px] w-full bg-bastion-navy/20 border border-bastion-border rounded-xl p-4">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
@@ -621,10 +621,10 @@ function MetricGraph({ title, data, lines, unit }: { title: string, data: any[],
                 </linearGradient>
               ))}
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} opacity={0.5} />
-            <XAxis dataKey="time" stroke="#475569" fontSize={8} tickLine={false} axisLine={false} />
-            <YAxis stroke="#475569" fontSize={8} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}${unit}`} />
-            <Tooltip contentStyle={{ backgroundColor: '#0F172A', border: '1px solid #1E293B', borderRadius: '4px', fontSize: '10px' }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#CBD5E1" vertical={false} opacity={0.5} />
+            <XAxis dataKey="time" stroke="#94A3B8" fontSize={8} tickLine={false} axisLine={false} />
+            <YAxis stroke="#94A3B8" fontSize={8} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}${unit}`} />
+            <Tooltip contentStyle={{ backgroundColor: '#F8F9FA', border: '1px solid #CBD5E1', borderRadius: '4px', fontSize: '10px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
             {lines.map(line => (
               <Area 
                 key={line.key}
@@ -651,9 +651,9 @@ function ResourceGauge({ label, value, color }: { label: string, value: number, 
     <div className="space-y-1">
       <div className="flex justify-between items-end">
         <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest font-mono">{label}</p>
-        <span className="text-[10px] font-bold text-slate-400">{value}%</span>
+        <span className="text-[10px] font-bold text-slate-500">{value}%</span>
       </div>
-      <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
+      <div className="h-1 bg-bastion-navy rounded-full overflow-hidden">
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}

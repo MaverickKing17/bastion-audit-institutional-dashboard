@@ -41,9 +41,9 @@ export function CriticalZone() {
             </div>
             
             <div className="space-y-1.5">
-              <h3 className="text-[13px] font-black tracking-wider text-white uppercase">{threat.type}</h3>
+              <h3 className="text-[13px] font-black tracking-wider text-slate-900 uppercase">{threat.type}</h3>
               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.1em] flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
                 SCOPE: {threat.target}
               </p>
             </div>
