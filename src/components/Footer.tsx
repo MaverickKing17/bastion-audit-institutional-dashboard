@@ -40,11 +40,11 @@ export function Footer({ onSelect }: FooterProps) {
 
         {/* Governance Column */}
         <div className="col-span-1">
-          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Governance Resources</h4>
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Governance & Policy</h4>
           <ul className="space-y-4">
-            <FooterLink label="Model Drift Analysis" onClick={() => onSelect('MODEL DRIFT')} />
-            <FooterLink label="Forensic Audit Trail Export" onClick={() => onSelect('FORENSIC')} />
-            <FooterLink label="Hardware Vault Attestation" onClick={() => onSelect('HARDWARE')} />
+            <FooterLink label="AML & KYC Compliance" onClick={() => onSelect('AML')} />
+            <FooterLink label="Conflict of Interest" onClick={() => onSelect('CONFLICTS')} />
+            <FooterLink label="Accessibility Statement" onClick={() => onSelect('ACCESSIBILITY')} />
             <FooterLink label="Incident Response Manual" onClick={() => onSelect('INCIDENT')} />
           </ul>
         </div>
@@ -72,10 +72,12 @@ export function Footer({ onSelect }: FooterProps) {
         <p className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">
           © {currentYear} Bastion Audit Security. All Sovereign Rights Reserved.
         </p>
-        <div className="flex gap-8 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-          <a href="#" className="hover:text-white transition-colors">Legal Disclosure</a>
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+          <button onClick={() => onSelect('PRIVACY')} className="hover:text-white transition-colors">Privacy Policy</button>
+          <button onClick={() => onSelect('TERMS')} className="hover:text-white transition-colors">Terms of Service</button>
+          <button onClick={() => onSelect('COOKIE')} className="hover:text-white transition-colors">Cookie Policy</button>
+          <button onClick={() => onSelect('DMCA')} className="hover:text-white transition-colors">DMCA</button>
+          <button onClick={() => onSelect('DISCLAIMER')} className="hover:text-white transition-colors">Legal Disclaimer</button>
         </div>
       </div>
     </footer>
