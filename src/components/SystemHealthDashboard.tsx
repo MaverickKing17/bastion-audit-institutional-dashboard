@@ -146,6 +146,7 @@ export function SystemHealthDashboard() {
     }))
   );
   const [lastTick, setLastTick] = useState(Date.now());
+  const [metricsNode, setMetricsNode] = useState<ComponentHealth | null>(null);
 
   const simulateUpdate = useCallback(() => {
     // Update Components
@@ -275,6 +276,7 @@ export function SystemHealthDashboard() {
                   isCorrelated={hoveredCompFromLog === node.name}
                   hasIncident={INCIDENT_LOGS.some(log => log.comp === node.name && log.sev === 'CRITICAL' || log.sev === 'HIGH')}
                   onClick={() => setExpandedNode(expandedNode === node.name ? null : node.name)}
+                  onViewMetrics={(node) => setMetricsNode(node)}
                 />
               </div>
             ))}
@@ -396,16 +398,26 @@ export function SystemHealthDashboard() {
           </table>
         </div>
       </section>
+
+      <AnimatePresence>
+        {metricsNode && (
+          <DetailedMetricsModal 
+            node={metricsNode} 
+            onClose={() => setMetricsNode(null)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick }: { 
+function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick, onViewMetrics }: { 
   node: ComponentHealth, 
   isExpanded: boolean, 
   isCorrelated?: boolean,
   hasIncident?: boolean,
-  onClick: () => void 
+  onClick: () => void,
+  onViewMetrics?: (node: ComponentHealth) => void
 }) {
   const statusColors = {
     OPERATIONAL: { border: 'border-bastion-green/20', iconColor: 'text-bastion-green', shadow: 'shadow-[0_0_15px_rgba(46,204,113,0.1)]' },
@@ -499,6 +511,17 @@ function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick }: {
               </div>
             </div>
 
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewMetrics && onViewMetrics(node);
+              }}
+              className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-[9px] font-black text-slate-400 hover:text-white uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group/metrics"
+            >
+              <BarChart3 size={12} className="group-hover/metrics:scale-110 transition-transform" />
+              View Detailed Metrics
+            </button>
+
             <button className="w-full py-2 bg-bastion-sapphire/10 hover:bg-bastion-sapphire/20 border border-bastion-sapphire/30 rounded-lg text-[9px] font-black text-bastion-sapphire uppercase tracking-[0.2em] transition-all">
               Initiate Full Forensic Diagnostic
             </button>
@@ -506,6 +529,118 @@ function NodeCard({ node, isExpanded, isCorrelated, hasIncident, onClick }: {
         )}
       </AnimatePresence>
     </motion.div>
+  );
+}
+
+function DetailedMetricsModal({ node, onClose }: { node: ComponentHealth, onClose: () => void }) {
+  const data = React.useMemo(() => Array.from({ length: 24 }, (_, i) => ({
+    time: `${23 - i}h ago`,
+    cpu: Math.max(5, Math.min(95, node.cpu + (Math.random() * 30 - 15))),
+    memory: Math.max(5, Math.min(95, node.memory + (Math.random() * 10 - 5))),
+    latency: Math.max(2, node.latency + (Math.random() * 20 - 10))
+  })).reverse(), [node]);
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-bastion-navy/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div 
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        className="w-full max-w-4xl bg-bastion-navy border border-bastion-border rounded-2xl shadow-2xl overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="px-8 py-6 border-b border-bastion-border flex items-center justify-between bg-bastion-navy-light/50">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-bastion-sapphire/10 border border-bastion-sapphire/20 flex items-center justify-center">
+              <BarChart3 className="text-bastion-sapphire" size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-white uppercase tracking-tight">{node.name}</h2>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Historical Performance Diagnostics // 24H Window</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-white/5 rounded-full text-slate-500 hover:text-white transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          {/* Summary Mini Stats */}
+          <div className="grid grid-cols-3 gap-6">
+            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Peak CPU Load</p>
+              <p className="text-xl font-light text-white tracking-tighter">{Math.max(...data.map(d => d.cpu)).toFixed(1)}%</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Avg Memory State</p>
+              <p className="text-xl font-light text-white tracking-tighter">{(data.reduce((acc, d) => acc + d.memory, 0) / data.length).toFixed(1)}%</p>
+            </div>
+            <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
+              <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">Latency Variance</p>
+              <p className="text-xl font-light text-bastion-gold tracking-tighter">±4.2ms</p>
+            </div>
+          </div>
+
+          {/* Charts */}
+          <MetricGraph title="Resource Utilization (CPU vs RAM)" data={data} lines={[{ key: 'cpu', color: '#4A90E2', name: 'CPU' }, { key: 'memory', color: '#FFD700', name: 'Memory' }]} unit="%" />
+          <MetricGraph title="Latency Signature (ms)" data={data} lines={[{ key: 'latency', color: '#2ecc71', name: 'Latency' }]} unit="ms" />
+        </div>
+
+        <div className="px-8 py-4 bg-bastion-navy-light/30 border-t border-bastion-border flex justify-between items-center">
+          <span className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">Sovereign Hardware Monitor v4.1 // Real-time Feed Active</span>
+          <button onClick={onClose} className="px-6 py-2 bg-bastion-sapphire text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-blue-600 transition-colors">
+            Close Diagnostics
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function MetricGraph({ title, data, lines, unit }: { title: string, data: any[], lines: { key: string, color: string, name: string }[], unit: string }) {
+  return (
+    <div className="space-y-4">
+      <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{title}</h3>
+      <div className="h-[200px] w-full bg-white/[0.01] border border-white/[0.03] rounded-xl p-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={data}>
+            <defs>
+              {lines.map(line => (
+                <linearGradient key={line.key} id={`grad-${line.key}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={line.color} stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor={line.color} stopOpacity={0}/>
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} opacity={0.5} />
+            <XAxis dataKey="time" stroke="#475569" fontSize={8} tickLine={false} axisLine={false} />
+            <YAxis stroke="#475569" fontSize={8} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}${unit}`} />
+            <Tooltip contentStyle={{ backgroundColor: '#0F172A', border: '1px solid #1E293B', borderRadius: '4px', fontSize: '10px' }} />
+            {lines.map(line => (
+              <Area 
+                key={line.key}
+                type="monotone" 
+                dataKey={line.key} 
+                name={line.name}
+                stroke={line.color} 
+                fill={`url(#grad-${line.key})`} 
+                strokeWidth={2}
+                animationDuration={1500}
+              />
+            ))}
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
   );
 }
 
