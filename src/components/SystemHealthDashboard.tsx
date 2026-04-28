@@ -6,12 +6,58 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Card } from './Common';
 
 const MOCK_COMPONENTS: ComponentHealth[] = [
-  { name: 'Lakera Guard', status: 'OPERATIONAL', uptime: '99.99%', latency: 12, cpu: 14, memory: 32, lastPulse: 'Now' },
-  { name: 'Firestore DB', status: 'OPERATIONAL', uptime: '99.98%', latency: 8, cpu: 22, memory: 64, lastPulse: '2s ago' },
-  { name: 'Agent Monitor', status: 'OPERATIONAL', uptime: '100%', latency: 45, cpu: 8, memory: 12, lastPulse: 'Now' },
-  { name: 'Encryption Vault', status: 'DEGRADED', uptime: '99.95%', latency: 154, cpu: 45, memory: 88, lastPulse: '12s ago' },
-  { name: 'Canadian Edge Gateway', status: 'OUTAGE', uptime: '98.42%', latency: 0, cpu: 0, memory: 0, lastPulse: '5m ago' },
+  { name: 'Canadian Edge Gateway', status: 'OUTAGE', uptime: '98.42%', latency: 0, cpu: 0, memory: 0, lastPulse: '5m ago', type: 'GATEWAY' },
+  { name: 'Lakera Guard', status: 'OPERATIONAL', uptime: '99.99%', latency: 12, cpu: 14, memory: 32, lastPulse: 'Now', type: 'SECURITY' },
+  { name: 'Encryption Vault', status: 'DEGRADED', uptime: '99.95%', latency: 154, cpu: 45, memory: 88, lastPulse: '12s ago', type: 'VAULT' },
+  { name: 'Agent Monitor', status: 'OPERATIONAL', uptime: '100%', latency: 45, cpu: 8, memory: 12, lastPulse: 'Now', type: 'MONITOR' },
+  { name: 'Firestore DB', status: 'OPERATIONAL', uptime: '99.98%', latency: 8, cpu: 22, memory: 64, lastPulse: '2s ago', type: 'DATA' },
 ];
+
+function ConnectionLine({ 
+  status, 
+  latency, 
+  className 
+}: { 
+  status: ComponentHealth['status'], 
+  latency: number,
+  className?: string 
+}) {
+  const isOnline = status !== 'OUTAGE';
+  const isDegraded = status === 'DEGRADED';
+  
+  const strokeColor = !isOnline ? '#ef4444' : isDegraded ? '#d4af37' : '#2ecc71';
+  const pulseDuration = !isOnline ? 0 : Math.max(0.5, latency / 50);
+
+  return (
+    <svg className={`absolute inset-0 w-8 h-full -left-4 pointer-events-none z-0 ${className}`}>
+      <motion.path
+        d="M 16 0 L 16 48" // matches the container h-12 (48px)
+        stroke={strokeColor}
+        strokeWidth="2"
+        strokeDasharray="4 4"
+        fill="transparent"
+        initial={{ opacity: 0.1 }}
+        animate={{ opacity: isOnline ? [0.1, 0.4, 0.1] : 0.05 }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      {isOnline && (
+        <motion.circle
+          r="3"
+          fill={strokeColor}
+          initial={{ cy: 0 }}
+          animate={{ cy: 48 }}
+          transition={{ 
+            duration: pulseDuration, 
+            repeat: Infinity, 
+            ease: "linear" 
+          }}
+          style={{ cx: 16 }}
+          className="filter blur-[1px]"
+        />
+      )}
+    </svg>
+  );
+}
 
 function ComponentStatusBadge({ status }: { status: ComponentHealth['status'] }) {
   const configs = {
@@ -78,14 +124,28 @@ export function SystemHealthDashboard() {
       {/* Main Grid: Topology + Performance */}
       <div className="grid grid-cols-12 gap-8">
         {/* Hardware Status Nodes */}
-        <div className="col-span-12 lg:col-span-5 space-y-4">
-          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-4 flex items-center gap-2">
+        <div className="col-span-12 lg:col-span-5 space-y-6">
+          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
             <Activity size={14} />
             Resource Node Topology
           </h2>
-          {MOCK_COMPONENTS.map((node) => (
-            <NodeCard key={node.name} node={node} />
-          ))}
+          
+          <div className="relative space-y-12">
+            {/* We render nodes with explicit connectivity layers between them */}
+            {MOCK_COMPONENTS.map((node, index) => (
+              <div key={node.name} className="relative">
+                {index < MOCK_COMPONENTS.length - 1 && (
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full h-12 w-px overflow-visible">
+                    <ConnectionLine 
+                      status={node.status} 
+                      latency={node.latency} 
+                    />
+                  </div>
+                )}
+                <NodeCard node={node} />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Global Latency Chart */}

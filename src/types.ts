@@ -41,6 +41,7 @@ export interface ComponentHealth {
   cpu: number;
   memory: number;
   lastPulse: string;
+  type?: string;
 }
 
 export interface HealthMetric {

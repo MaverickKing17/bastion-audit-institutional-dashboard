@@ -5,6 +5,8 @@ import { RegulatoryMapping } from './components/RegulatoryMapping';
 import { CriticalZone } from './components/CriticalZone';
 import { KillSwitchFlow } from './components/KillSwitchFlow';
 import { SystemHealthDashboard } from './components/SystemHealthDashboard';
+import { Footer } from './components/Footer';
+import { Chat } from './components/Chat';
 import { Severity, SecurityEvent } from './types';
 import { Activity, ShieldCheck, Power, Search, Bell, UserCircle, LayoutGrid } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -51,7 +53,7 @@ export default function App() {
       
       <main className="flex-1 flex flex-col bg-[#0B1221] overflow-hidden">
         {/* Institutional TopNav */}
-        <header className="h-16 border-b border-bastion-border px-8 flex items-center justify-between bg-bastion-navy/30 backdrop-blur-xl z-10">
+        <header className="h-16 border-b border-bastion-border px-8 flex items-center justify-between bg-bastion-navy z-10">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2.5">
               <div className="p-1.5 bg-bastion-sapphire/10 rounded-lg border border-bastion-sapphire/20">
@@ -129,7 +131,6 @@ export default function App() {
                 <section id="tier-2" className="grid grid-cols-12 gap-8 h-[500px]">
                   <div className="col-span-8 flex flex-col">
                     <div className="flex-1 bg-bastion-navy-light border border-bastion-border rounded-xl p-6 shadow-2xl relative overflow-hidden">
-                       <div className="absolute top-0 right-0 w-32 h-32 bg-bastion-sapphire/5 blur-3xl rounded-full" />
                        <AgentBehaviorStream events={events} />
                     </div>
                   </div>
@@ -179,10 +180,12 @@ export default function App() {
               <SystemHealthDashboard />
             )}
           </div>
+          <Footer />
         </div>
       </main>
 
       <KillSwitchFlow isOpen={isKillSwitchOpen} onClose={() => setIsKillSwitchOpen(false)} />
+      <Chat />
     </div>
   );
 }

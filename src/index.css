@@ -24,11 +24,11 @@
 
 @layer components {
   .institutional-card {
-    @apply bg-bastion-navy-light/50 backdrop-blur-sm border border-bastion-border rounded-xl shadow-lg transition-all duration-300;
+    @apply bg-bastion-navy-light border border-bastion-border rounded-xl shadow-2xl transition-all duration-300;
   }
   
   .terminal-text {
-    @apply font-mono text-[12px] leading-relaxed tracking-tight;
+    @apply font-mono text-[12px] leading-relaxed tracking-tight text-slate-300;
   }
 
   .label-xs {
