@@ -19,27 +19,29 @@ export function AgentBehaviorStream({ events }: StreamProps) {
   }, [events]);
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2 text-slate-400">
-          <Terminal size={14} />
-          <span className="text-xs font-bold uppercase tracking-wider">Agent Behavior Forensic Stream</span>
+    <div className="flex flex-col h-full bg-bastion-navy">
+      <div className="flex items-center justify-between p-4 border-b border-bastion-border bg-bastion-navy-light/50">
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 bg-bastion-sapphire/10 rounded border border-bastion-sapphire/20">
+            <Terminal size={14} className="text-bastion-sapphire" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white">Forensic Behavior Stream</span>
         </div>
-        <div className="flex items-center space-x-3 text-[11px] text-slate-500 font-medium">
-          <span className="flex items-center space-x-1">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-bastion-green/10 border border-bastion-green/20">
              <span className="w-1.5 h-1.5 rounded-full bg-bastion-green animate-pulse" />
-             <span>LIVE FEED</span>
-          </span>
-          <button className="flex items-center space-x-1 hover:text-slate-300">
+             <span className="text-[9px] font-black text-bastion-green uppercase tracking-widest leading-none">Live</span>
+          </div>
+          <button className="flex items-center gap-1.5 text-[9px] font-black text-slate-500 hover:text-white transition-colors uppercase tracking-widest">
             <Download size={12} />
-            <span>EXPORT LOGS</span>
+            <span>CSV Export</span>
           </button>
         </div>
       </div>
 
       <div 
         ref={scrollRef}
-        className="flex-1 bg-black/40 border border-slate-800 rounded-lg p-4 overflow-y-auto custom-scrollbar font-mono text-[13px]"
+        className="flex-1 p-6 overflow-y-auto custom-scrollbar font-mono text-[12px] leading-relaxed"
       >
         <AnimatePresence initial={false}>
           {events.map((event) => (
@@ -48,24 +50,24 @@ export function AgentBehaviorStream({ events }: StreamProps) {
               key={event.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="group relative border-b border-white/5 py-2 last:border-0 hover:bg-white/5 transition-colors"
+              className="group relative border-b border-white/[0.03] py-3 last:border-0 hover:bg-white/[0.02] transition-colors"
               onMouseEnter={() => setHoveredEventId(event.id)}
               onMouseLeave={() => setHoveredEventId(null)}
             >
-              <div className="grid grid-cols-[120px_1fr_100px] gap-4 items-start">
-                <span className="text-slate-600 text-[11px]">[{new Date(event.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}]</span>
+              <div className="grid grid-cols-[110px_1fr_100px] gap-6 items-start">
+                <span className="text-slate-600 font-bold">[{new Date(event.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}]</span>
                 
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center space-x-3">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-start gap-4">
                     <span className={clsx(
-                      "font-bold uppercase text-[11px]",
+                      "font-black uppercase text-[10px] tracking-widest whitespace-nowrap mt-1",
                       event.severity === Severity.CRITICAL ? "text-bastion-crimson" :
                       event.severity === Severity.HIGH ? "text-bastion-gold" :
                       event.severity === Severity.MEDIUM ? "text-bastion-sapphire" : "text-bastion-green"
                     )}>
                       {event.type}
                     </span>
-                    <span className="text-slate-300">{event.message}</span>
+                    <span className="text-slate-300 font-medium">{event.message}</span>
                   </div>
                   
                   {hoveredEventId === event.id && (

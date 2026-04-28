@@ -1,16 +1,22 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { Activity, Server, Database, Shield, Zap, Clock, AlertTriangle, CheckCircle2, ChevronRight, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Activity, Server, Database, Shield, Zap, Clock, AlertTriangle, CheckCircle2, ChevronRight, BarChart3, RefreshCcw, Download } from 'lucide-react';
 import { ComponentHealth, HealthMetric } from '@/src/types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from './Common';
 
-const MOCK_COMPONENTS: ComponentHealth[] = [
-  { name: 'Canadian Edge Gateway', status: 'OUTAGE', uptime: '98.42%', latency: 0, cpu: 0, memory: 0, lastPulse: '5m ago', type: 'GATEWAY' },
-  { name: 'Lakera Guard', status: 'OPERATIONAL', uptime: '99.99%', latency: 12, cpu: 14, memory: 32, lastPulse: 'Now', type: 'SECURITY' },
-  { name: 'Encryption Vault', status: 'DEGRADED', uptime: '99.95%', latency: 154, cpu: 45, memory: 88, lastPulse: '12s ago', type: 'VAULT' },
-  { name: 'Agent Monitor', status: 'OPERATIONAL', uptime: '100%', latency: 45, cpu: 8, memory: 12, lastPulse: 'Now', type: 'MONITOR' },
-  { name: 'Firestore DB', status: 'OPERATIONAL', uptime: '99.98%', latency: 8, cpu: 22, memory: 64, lastPulse: '2s ago', type: 'DATA' },
+const INITIAL_COMPONENTS: ComponentHealth[] = [
+  { name: 'Canadian Edge Gateway', status: 'OPERATIONAL', uptime: '99.98%', latency: 12, cpu: 15, memory: 28, lastPulse: 'Now', type: 'GATEWAY' },
+  { name: 'Lakera Guard', status: 'OPERATIONAL', uptime: '99.99%', latency: 8, cpu: 12, memory: 34, lastPulse: 'Now', type: 'SECURITY' },
+  { name: 'Encryption Vault', status: 'OPERATIONAL', uptime: '99.99%', latency: 15, cpu: 18, memory: 45, lastPulse: 'Now', type: 'VAULT' },
+  { name: 'Agent Monitor', status: 'OPERATIONAL', uptime: '100%', latency: 42, cpu: 7, memory: 15, lastPulse: 'Now', type: 'MONITOR' },
+  { name: 'Firestore DB', status: 'OPERATIONAL', uptime: '99.98%', latency: 6, cpu: 20, memory: 58, lastPulse: 'Now', type: 'DATA' },
+];
+
+const INCIDENT_LOGS = [
+  { time: '2026-04-28 14:12:01', comp: 'Vault-Primary', event: 'Token exhaustion warning on cluster-C', sev: 'HIGH', ref: 'HW-902' },
+  { time: '2026-04-28 11:45:22', comp: 'DB-Instance', event: 'Primary write-sharding rebalance', sev: 'MEDIUM', ref: 'DB-441' },
+  { time: '2026-04-28 09:20:11', comp: 'Lakera-Gate', event: 'Hardware-level bypass lock enabled', sev: 'CRITICAL', ref: 'SCR-110' },
 ];
 
 function ConnectionLine({ 
@@ -91,12 +97,89 @@ function ComponentStatusBadge({ status }: { status: ComponentHealth['status'] })
   );
 }
 
-const MOCK_LATENCY_DATA: HealthMetric[] = Array.from({ length: 20 }, (_, i) => ({
-  timestamp: `${i}:00`,
-  value: 10 + Math.random() * 20 + (i > 15 ? 40 : 0)
-}));
-
 export function SystemHealthDashboard() {
+  const [components, setComponents] = useState<ComponentHealth[]>(INITIAL_COMPONENTS);
+  const [expandedNode, setExpandedNode] = useState<string | null>(null);
+  const [latencyData, setLatencyData] = useState<HealthMetric[]>(() => 
+    Array.from({ length: 20 }, (_, i) => ({
+      timestamp: `${i}:00`,
+      value: 15 + Math.random() * 10
+    }))
+  );
+  const [lastTick, setLastTick] = useState(Date.now());
+
+  const simulateUpdate = useCallback(() => {
+    // Update Components
+    setComponents(prev => prev.map(comp => {
+      // Jitter metrics
+      const newCpu = Math.max(2, Math.min(98, comp.cpu + (Math.random() * 4 - 2)));
+      const newMemory = Math.max(5, Math.min(95, comp.memory + (Math.random() * 2 - 1)));
+      const newLatency = Math.max(2, comp.latency + (Math.random() * 6 - 3));
+      
+      // Randomly change status (very low probability)
+      let newStatus = comp.status;
+      const rand = Math.random();
+      if (rand > 0.99) {
+        newStatus = rand > 0.997 ? 'OUTAGE' : 'DEGRADED';
+      } else if (rand < 0.1 && (comp.status === 'DEGRADED' || comp.status === 'OUTAGE')) {
+        newStatus = 'OPERATIONAL';
+      }
+
+      return {
+        ...comp,
+        cpu: Math.round(newCpu),
+        memory: Math.round(newMemory),
+        latency: Math.round(newLatency),
+        status: newStatus,
+        lastPulse: 'Now'
+      };
+    }));
+
+    // Update Latency Data (Scrolling graph effect)
+    setLatencyData(prev => {
+      const lastPoint = prev[prev.length - 1];
+      const newValue = Math.max(10, Math.min(100, lastPoint.value + (Math.random() * 10 - 5)));
+      const newTimestamp = new Date().toLocaleTimeString([], { hour12: false, minute: '2-digit', second: '2-digit' });
+      
+      const newArr = [...prev.slice(1), { timestamp: newTimestamp, value: Math.round(newValue) }];
+      return newArr;
+    });
+
+    setLastTick(Date.now());
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(simulateUpdate, 3000);
+    return () => clearInterval(interval);
+  }, [simulateUpdate]);
+
+  const handleExportLogs = () => {
+    const headers = ['Timestamp', 'Component', 'Event Description', 'Severity', 'Reference'];
+    const csvContent = [
+      headers.join(','),
+      ...INCIDENT_LOGS.map(log => [
+        `"${log.time}"`,
+        `"${log.comp}"`,
+        `"${log.event}"`,
+        `"${log.sev}"`,
+        `"SYS-${log.ref}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `hardware_interruption_log_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const avgLatency = Math.round(components.reduce((acc, c) => acc + c.latency, 0) / components.length);
+  const activeNodes = components.filter(c => c.status !== 'OUTAGE').length;
+
   return (
     <div className="space-y-8 pb-12">
       {/* Header Stat Row */}
@@ -109,15 +192,15 @@ export function SystemHealthDashboard() {
         />
         <StatCard 
           label="Average Request Latency" 
-          value="24.4ms" 
-          trend="-1.2ms" 
-          icon={<Zap className="text-bastion-gold" size={20} />} 
+          value={`${avgLatency}ms`} 
+          trend={avgLatency > 30 ? "+2.4ms" : "-1.2ms"} 
+          icon={<Zap className={avgLatency > 50 ? "text-bastion-crimson" : avgLatency > 30 ? "text-bastion-gold" : "text-bastion-green"} size={20} />} 
         />
         <StatCard 
           label="Active Infrastructure Nodes" 
-          value="12/12" 
-          status="ONLINE"
-          icon={<Server className="text-bastion-sapphire" size={20} />} 
+          value={`${activeNodes}/${components.length}`} 
+          status={activeNodes === components.length ? "HEALTHY" : "CRITICAL"}
+          icon={<Server className={activeNodes === components.length ? "text-bastion-sapphire" : "text-bastion-crimson"} size={20} />} 
         />
       </div>
 
@@ -125,16 +208,21 @@ export function SystemHealthDashboard() {
       <div className="grid grid-cols-12 gap-8">
         {/* Hardware Status Nodes */}
         <div className="col-span-12 lg:col-span-5 space-y-6">
-          <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 mb-6 flex items-center gap-2">
-            <Activity size={14} />
-            Resource Node Topology
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 flex items-center gap-2">
+              <Activity size={14} />
+              Resource Node Topology
+            </h2>
+            <div className="flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase tracking-widest">
+              <RefreshCcw size={10} className="animate-spin-slow" />
+              Live Simulation Frequency: 3.0s
+            </div>
+          </div>
           
           <div className="relative space-y-12">
-            {/* We render nodes with explicit connectivity layers between them */}
-            {MOCK_COMPONENTS.map((node, index) => (
+            {components.map((node, index) => (
               <div key={node.name} className="relative">
-                {index < MOCK_COMPONENTS.length - 1 && (
+                {index < components.length - 1 && (
                   <div className="absolute left-1/2 -translate-x-1/2 top-full h-12 w-px overflow-visible">
                     <ConnectionLine 
                       status={node.status} 
@@ -142,7 +230,11 @@ export function SystemHealthDashboard() {
                     />
                   </div>
                 )}
-                <NodeCard node={node} />
+                <NodeCard 
+                  node={node} 
+                  isExpanded={expandedNode === node.name}
+                  onClick={() => setExpandedNode(expandedNode === node.name ? null : node.name)}
+                />
               </div>
             ))}
           </div>
@@ -156,7 +248,7 @@ export function SystemHealthDashboard() {
           >
             <div className="h-[340px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={MOCK_LATENCY_DATA}>
+                <AreaChart data={latencyData}>
                   <defs>
                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#4A90E2" stopOpacity={0.3}/>
@@ -177,6 +269,7 @@ export function SystemHealthDashboard() {
                     tickLine={false} 
                     axisLine={false} 
                     tickFormatter={(val) => `${val}ms`}
+                    domain={[0, 'auto']}
                   />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#161F30', border: '1px solid #1E293B', borderRadius: '8px', fontSize: '12px' }}
@@ -189,19 +282,19 @@ export function SystemHealthDashboard() {
                     fillOpacity={1} 
                     fill="url(#colorValue)" 
                     strokeWidth={2}
+                    animationDuration={1000}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
             <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500 border-t border-bastion-border pt-4">
               <div className="flex gap-4">
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-bastion-sapphire" /> P99 Latency</span>
-                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-700" /> Baseline</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-bastion-sapphire" /> Institutional Pulse</span>
+                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-700" /> Latency Floor</span>
               </div>
-              <button className="flex items-center gap-1 hover:text-white transition-colors">
-                <BarChart3 size={12} />
-                VIEW DETAILED ANALYTICS
-              </button>
+              <div className="text-[9px] font-bold uppercase tracking-widest text-slate-600">
+                Last Sync: {new Date(lastTick).toLocaleTimeString()}
+              </div>
             </div>
           </Card>
         </div>
@@ -209,9 +302,18 @@ export function SystemHealthDashboard() {
 
       {/* Internal System Incident Log */}
       <section className="space-y-4">
-        <div className="flex items-center gap-2">
-           <AlertTriangle size={16} className="text-bastion-gold" />
-           <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Hardware Interruption Log (Last 24H)</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+             <AlertTriangle size={16} className="text-bastion-gold" />
+             <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500">Hardware Interruption Log (Last 24H)</h2>
+          </div>
+          <button 
+            onClick={handleExportLogs}
+            className="flex items-center gap-2 px-3 py-1.5 bg-bastion-navy border border-bastion-border rounded-lg text-[10px] font-black text-slate-400 hover:text-white hover:border-slate-500 transition-all uppercase tracking-widest italic"
+          >
+            <Download size={14} />
+            Export CSV
+          </button>
         </div>
         <div className="institutional-card overflow-hidden">
           <table className="w-full text-left font-mono text-[11px]">
@@ -225,11 +327,7 @@ export function SystemHealthDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {[
-                { time: '2026-04-28 14:12:01', comp: 'Vault-Primary', event: 'Token exhaustion warning on cluster-C', sev: 'HIGH', ref: 'HW-902' },
-                { time: '2026-04-28 11:45:22', comp: 'DB-Instance', event: 'Primary write-sharding rebalance', sev: 'MEDIUM', ref: 'DB-441' },
-                { time: '2026-04-28 09:20:11', comp: 'Lakera-Gate', event: 'Hardware-level bypass lock enabled', sev: 'CRITICAL', ref: 'SCR-110' },
-              ].map((log, i) => (
+              {INCIDENT_LOGS.map((log, i) => (
                 <tr key={i} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 font-normal text-slate-500">{log.time}</td>
                   <td className="px-6 py-4 font-bold text-white uppercase">{log.comp}</td>
@@ -253,7 +351,7 @@ export function SystemHealthDashboard() {
   );
 }
 
-function NodeCard({ node, ...props }: { node: ComponentHealth, [key: string]: any }) {
+function NodeCard({ node, isExpanded, onClick }: { node: ComponentHealth, isExpanded: boolean, onClick: () => void }) {
   const statusColors = {
     OPERATIONAL: { border: 'border-bastion-green/20', iconColor: 'text-bastion-green', shadow: 'shadow-[0_0_15px_rgba(46,204,113,0.1)]' },
     DEGRADED: { border: 'border-bastion-gold/20', iconColor: 'text-bastion-gold', shadow: 'shadow-[0_0_15px_rgba(212,175,55,0.1)]' },
@@ -263,37 +361,80 @@ function NodeCard({ node, ...props }: { node: ComponentHealth, [key: string]: an
   const currentStatus = statusColors[node.status];
 
   return (
-    <div className={`institutional-card p-5 group hover:border-bastion-sapphire/30 transition-all cursor-pointer ${currentStatus.shadow}`} {...props}>
+    <motion.div 
+      layout
+      onClick={onClick}
+      className={`institutional-card p-5 group hover:border-bastion-sapphire/30 transition-all cursor-pointer relative overflow-hidden ${currentStatus.shadow} ${isExpanded ? 'ring-1 ring-bastion-sapphire/50 bg-bastion-navy-light' : ''}`}
+    >
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg bg-bastion-navy border ${currentStatus.border}`}>
+          <motion.div layout className={`p-2 rounded-lg bg-bastion-navy border ${currentStatus.border}`}>
             {node.name.includes('DB') ? <Database size={16} className={currentStatus.iconColor} /> : 
              node.name.includes('Guard') ? <Shield size={16} className={currentStatus.iconColor} /> : 
              node.name.includes('Gateway') ? <Zap size={16} className={currentStatus.iconColor} /> :
              <Server size={16} className={currentStatus.iconColor} />}
-          </div>
+          </motion.div>
           <div>
-            <h3 className="text-sm font-black text-white uppercase tracking-tight">{node.name}</h3>
-            <div className="flex items-center gap-2 mt-1">
+            <motion.h3 layout className="text-sm font-black text-white uppercase tracking-tight">{node.name}</motion.h3>
+            <motion.div layout className="flex items-center gap-2 mt-1">
               <ComponentStatusBadge status={node.status} />
-            </div>
+            </motion.div>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xs font-mono font-bold text-white">{node.uptime}</p>
-          <p className="text-[9px] text-slate-600 uppercase font-bold tracking-widest mt-0.5">UPTIME</p>
+          <motion.p layout className="text-xs font-mono font-bold text-white">{node.uptime}</motion.p>
+          <motion.p layout className="text-[9px] text-slate-600 uppercase font-bold tracking-widest mt-0.5">UPTIME</motion.p>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-6 pt-4 border-t border-white/5">
+      <motion.div layout className="grid grid-cols-3 gap-6 pt-4 border-t border-white/5">
         <ResourceGauge label="CPU Usage" value={node.cpu} color="bg-bastion-sapphire" />
         <ResourceGauge label="RAM Load" value={node.memory} color="bg-bastion-gold" />
         <div className="space-y-1">
           <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest">Latency</p>
           <p className="text-xs font-mono font-bold text-slate-300">{node.latency}ms</p>
         </div>
-      </div>
-    </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="pt-6 mt-6 border-t border-white/5 space-y-4"
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-black/20 rounded-lg border border-white/5">
+                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Provisioned Region</p>
+                <p className="text-[11px] font-black text-white uppercase">ca-central-1 (Montreal)</p>
+              </div>
+              <div className="p-3 bg-black/20 rounded-lg border border-white/5">
+                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Encryption Mode</p>
+                <p className="text-[11px] font-black text-bastion-green uppercase">FIPS 140-2 L3</p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <span>Cluster Pulse Integrity</span>
+                <span className="text-bastion-green">99.9%</span>
+              </div>
+              <div className="flex gap-1 h-1">
+                {[...Array(12)].map((_, i) => (
+                  <div key={i} className={`flex-1 rounded-full ${i < 11 ? 'bg-bastion-green/40' : 'bg-bastion-crimson/40'}`} />
+                ))}
+              </div>
+            </div>
+
+            <button className="w-full py-2 bg-bastion-sapphire/10 hover:bg-bastion-sapphire/20 border border-bastion-sapphire/30 rounded-lg text-[9px] font-black text-bastion-sapphire uppercase tracking-[0.2em] transition-all">
+              Initiate Full Forensic Diagnostic
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

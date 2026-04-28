@@ -27,35 +27,38 @@ export function CriticalZone() {
             key={threat.id}
             whileHover={{ y: -2 }}
             className={`
-              relative p-6 rounded-xl border bg-gradient-to-br transition-all
+              relative p-6 rounded-xl border bg-bastion-navy-light transition-all
               ${threat.severity === Severity.CRITICAL 
-                ? 'border-bastion-crimson/30 from-bastion-crimson/5 to-transparent' 
-                : 'border-bastion-gold/30 from-bastion-gold/5 to-transparent'}
+                ? 'border-bastion-crimson/20 shadow-lg shadow-bastion-crimson/5' 
+                : 'border-bastion-gold/20 shadow-lg shadow-bastion-gold/5'}
             `}
           >
             <div className="flex justify-between items-center mb-6">
-              <div className="p-2 bg-bastion-navy rounded-lg border border-white/5">
+              <div className={`p-2 rounded-lg bg-bastion-navy border ${threat.severity === Severity.CRITICAL ? 'border-bastion-crimson/20' : 'border-bastion-gold/20'}`}>
                 {threat.icon}
               </div>
-              <span className="text-[9px] font-mono font-bold text-slate-600 bg-black/20 px-2 py-0.5 rounded uppercase">{threat.time}</span>
+              <span className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest">{threat.time}</span>
             </div>
             
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold tracking-tight text-white uppercase italic">{threat.type}</h3>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Scope: {threat.target}</p>
+            <div className="space-y-1.5">
+              <h3 className="text-[13px] font-black tracking-wider text-white uppercase">{threat.type}</h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.1em] flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-slate-700" />
+                SCOPE: {threat.target}
+              </p>
             </div>
 
             <div className="mt-8 flex gap-2">
               <button className={`
-                flex-1 py-1.5 rounded font-black text-[9px] uppercase tracking-widest transition-all
+                flex-1 py-2.5 rounded-lg font-black text-[10px] uppercase tracking-[0.2em] transition-all border
                 ${threat.severity === Severity.CRITICAL 
-                  ? 'bg-bastion-crimson text-white hover:brightness-110' 
-                  : 'bg-bastion-gold text-bastion-navy hover:brightness-110'}
+                  ? 'bg-bastion-crimson/10 border-bastion-crimson/30 text-bastion-crimson hover:bg-bastion-crimson hover:text-white' 
+                  : 'bg-bastion-gold/10 border-bastion-gold/30 text-bastion-gold hover:bg-bastion-gold hover:text-bastion-navy'}
               `}>
-                ACKNOWLEDGE
+                Acknowledge Threat
               </button>
-              <button className="px-3 py-1.5 bg-white/5 rounded border border-white/5 hover:bg-white/10 transition-colors">
-                <ChevronRight size={12} className="text-slate-500" />
+              <button className="px-4 py-2.5 bg-bastion-navy border border-bastion-border rounded-lg hover:border-slate-500 transition-colors">
+                <ChevronRight size={14} className="text-slate-500" />
               </button>
             </div>
           </motion.div>

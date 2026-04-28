@@ -53,51 +53,68 @@ export default function App() {
       
       <main className="flex-1 flex flex-col bg-[#0B1221] overflow-hidden">
         {/* Institutional TopNav */}
-        <header className="h-16 border-b border-bastion-border px-8 flex items-center justify-between bg-bastion-navy z-10">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 bg-bastion-sapphire/10 rounded-lg border border-bastion-sapphire/20">
-                {currentView === 'dashboard' ? <LayoutGrid size={16} className="text-bastion-sapphire" /> : <Activity size={16} className="text-bastion-sapphire" />}
+        <header className="h-16 border-b border-bastion-border px-10 flex items-center justify-between bg-bastion-navy/80 backdrop-blur-md z-10">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-bastion-sapphire to-bastion-sapphire/50 rounded flex items-center justify-center shadow-lg shadow-bastion-sapphire/20">
+                <ShieldCheck size={18} className="text-white" />
               </div>
-              <h2 className="text-[11px] font-black uppercase tracking-[0.25em] text-white">
-                {currentView === 'dashboard' ? 'Security Audit' : 'System Health'}
-              </h2>
+              <div>
+                <h1 className="text-[10px] font-black uppercase tracking-[0.3em] text-white leading-none">Bastion</h1>
+                <p className="text-[8px] font-bold text-slate-500 uppercase tracking-[0.2em] mt-1">Institutional OS</p>
+              </div>
             </div>
             
-            <div className="h-4 w-px bg-bastion-border" />
+            <div className="h-6 w-px bg-bastion-border" />
             
-            <div className="flex items-center gap-4">
-              <div className="flex gap-0.5 h-3 items-end">
-                {[3, 6, 4, 8, 5, 7, 4].map((h, i) => (
-                  <motion.div 
-                    key={i} 
-                    animate={{ height: h * 1.2 }} 
-                    transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.15 }}
-                    className="w-0.5 bg-bastion-green/60 rounded-full" 
-                  />
-                ))}
+            <div className="flex items-center gap-5">
+              <div className="flex flex-col">
+                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest mb-1">Integrity Layer</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-0.5 h-3 items-end">
+                    {[3, 6, 4, 8, 5, 7, 4].map((h, i) => (
+                      <motion.div 
+                        key={i} 
+                        animate={{ height: [h, h * 1.5, h] }} 
+                        transition={{ repeat: Infinity, duration: 2, delay: i * 0.15 }}
+                        className="w-0.5 bg-bastion-green/60 rounded-full" 
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[9px] font-bold text-bastion-green uppercase tracking-[0.15em]">Global Monitoring Active</span>
+                </div>
               </div>
-              <span className="text-[9px] font-bold text-bastion-green uppercase tracking-widest">Active Monitoring</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
+             <div className="hidden xl:flex items-center gap-6 pr-6 border-r border-bastion-border">
+                <div className="text-right">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Threat Level</p>
+                  <p className="text-[10px] font-bold text-bastion-green uppercase tracking-widest">Normal // 0.04%</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Active Nodes</p>
+                  <p className="text-[10px] font-bold text-white uppercase tracking-widest">12/12 Verified</p>
+                </div>
+             </div>
+
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-bastion-sapphire transition-colors" size={14} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-bastion-sapphire transition-colors" size={12} />
               <input 
                 type="text" 
-                placeholder="Search logs..." 
-                className="bg-black/20 border border-bastion-border rounded-lg pl-9 pr-4 py-1.5 text-[11px] font-medium w-56 focus:outline-none focus:border-bastion-sapphire focus:bg-black/40 transition-all text-slate-300"
+                placeholder="Search institutional logs..." 
+                className="bg-black/40 border border-bastion-border rounded-lg pl-9 pr-4 py-2 text-[10px] font-medium w-64 focus:outline-none focus:border-bastion-sapphire focus:ring-1 focus:ring-bastion-sapphire/20 transition-all text-slate-300 placeholder:text-slate-700 placeholder:uppercase placeholder:tracking-widest"
               />
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               <button 
                 onClick={() => setIsKillSwitchOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-bastion-crimson border border-bastion-crimson/50 rounded-lg text-white font-black text-[9px] uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-bastion-crimson/20"
+                className="flex items-center gap-2.5 px-4 py-2 bg-bastion-crimson border border-bastion-crimson/30 rounded-lg text-white font-black text-[9px] uppercase tracking-[0.2em] hover:bg-bastion-crimson/90 transition-all shadow-lg shadow-bastion-crimson/10 active:scale-95"
               >
-                <Power size={12} />
-                Kill-Switch
+                <Power size={14} />
+                Emergency Kill-Switch
               </button>
               
               <div className="h-6 w-px bg-bastion-border" />
@@ -128,34 +145,37 @@ export default function App() {
                 <div className="h-px bg-gradient-to-r from-transparent via-bastion-border to-transparent" />
 
                 {/* TIER 2: Analyst Operational Zone */}
-                <section id="tier-2" className="grid grid-cols-12 gap-8 h-[500px]">
+                <section id="tier-2" className="grid grid-cols-12 gap-8 h-[550px]">
                   <div className="col-span-8 flex flex-col">
-                    <div className="flex-1 bg-bastion-navy-light border border-bastion-border rounded-xl p-6 shadow-2xl relative overflow-hidden">
+                    <div className="flex-1 bg-bastion-navy border border-bastion-border rounded-xl shadow-2xl relative overflow-hidden">
                        <AgentBehaviorStream events={events} />
                     </div>
                   </div>
                   
                   <div className="col-span-4 space-y-6">
-                    <div className="bg-bastion-navy-light border border-bastion-border rounded-xl p-6 shadow-xl h-full flex flex-col">
-                       <div className="flex items-center gap-2 mb-6 text-slate-400">
-                         <ShieldCheck size={16} />
-                         <span className="text-xs font-black uppercase tracking-widest leading-none mt-0.5">Audit Readiness Score</span>
+                    <div className="bg-bastion-navy border border-bastion-border rounded-xl p-8 shadow-xl h-full flex flex-col">
+                       <div className="flex items-center gap-3 mb-10 text-slate-500">
+                         <div className="p-2 bg-bastion-sapphire/5 rounded-lg border border-bastion-sapphire/10">
+                           <ShieldCheck size={16} className="text-bastion-sapphire" />
+                         </div>
+                         <span className="text-[11px] font-black uppercase tracking-[0.2em] leading-none">Audit Readiness Score</span>
                        </div>
                        
                        <div className="flex-1 flex flex-col justify-center">
-                          <div className="flex items-baseline gap-2 mb-2">
-                            <span className="text-6xl font-light tracking-tighter text-white">94.2</span>
+                          <div className="flex items-baseline gap-3 mb-2">
+                            <span className="text-7xl font-light tracking-tighter text-white">94.2</span>
+                            <span className="text-xs font-black text-bastion-green uppercase tracking-widest">+2.3% ▲</span>
                           </div>
-                          <p className="text-[11px] font-bold text-bastion-green uppercase tracking-[0.2em]">+2.3% THIS WEEK</p>
+                          <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.25em] mb-12">Institutional Stability Index</p>
                           
-                          <div className="mt-8 space-y-4">
+                          <div className="space-y-6">
                             <AuditMetric label="Data Forensic Trace" value={98} />
                             <AuditMetric label="Identity Verifiability" value={91} />
                             <AuditMetric label="Model Drift Threshold" value={95} />
                           </div>
                        </div>
 
-                       <button className="mt-8 w-full py-3 bg-white/5 border border-white/5 rounded-lg text-xs font-bold text-slate-400 hover:text-white hover:bg-white/10 transition-all uppercase tracking-widest italic">
+                       <button className="mt-12 w-full py-4 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-slate-400 hover:text-white hover:bg-white/10 transition-all uppercase tracking-[0.2em] italic">
                          Generate OSFI Audit Pack
                        </button>
                     </div>
