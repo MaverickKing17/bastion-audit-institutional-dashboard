@@ -52,12 +52,12 @@ export function Card({ children, title, subtitle, className, ...props }: { child
       {...props}
     >
       {(title || subtitle) && (
-        <div className="px-5 py-4 border-bottom border-bastion-border bg-bastion-navy/20">
-          {title && <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">{title}</h3>}
-          {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+        <div className="px-6 py-4 border-b border-bastion-border/50 bg-bastion-navy/20">
+          {title && <h3 className="label-xs text-slate-400">{title}</h3>}
+          {subtitle && <p className="text-[11px] text-slate-500 mt-0.5 lowercase font-medium tracking-tight overflow-hidden text-ellipsis whitespace-nowrap">{subtitle}</p>}
         </div>
       )}
-      <div className="flex-1 p-5">
+      <div className="flex-1 p-6">
         {children}
       </div>
     </motion.div>

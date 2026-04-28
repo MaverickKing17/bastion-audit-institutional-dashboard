@@ -12,20 +12,26 @@
   --color-bastion-sapphire: #4A90E2;
   --color-bastion-green: #2ECC71;
   --color-bastion-border: #1E293B;
+  --color-bastion-border-dim: #161F30;
+  --color-bastion-bg-accent: rgba(74, 144, 226, 0.03);
 }
 
 @layer base {
   body {
-    @apply bg-bastion-navy text-slate-200 antialiased selection:bg-bastion-crimson/30;
+    @apply bg-bastion-navy text-slate-300 antialiased selection:bg-bastion-crimson/30;
   }
 }
 
 @layer components {
   .institutional-card {
-    @apply bg-bastion-navy-light border border-bastion-border rounded-lg shadow-xl overflow-hidden;
+    @apply bg-bastion-navy-light/50 backdrop-blur-sm border border-bastion-border rounded-xl shadow-lg transition-all duration-300;
   }
   
   .terminal-text {
-    @apply font-mono text-[13px] leading-relaxed tracking-tight;
+    @apply font-mono text-[12px] leading-relaxed tracking-tight;
+  }
+
+  .label-xs {
+    @apply text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500;
   }
 }

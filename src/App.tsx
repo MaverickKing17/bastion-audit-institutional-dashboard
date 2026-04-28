@@ -51,61 +51,62 @@ export default function App() {
       
       <main className="flex-1 flex flex-col bg-[#0B1221] overflow-hidden">
         {/* Institutional TopNav */}
-        <header className="h-20 border-b border-bastion-border px-8 flex items-center justify-between bg-bastion-navy/50 backdrop-blur-md z-10">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
-              {currentView === 'dashboard' ? <LayoutGrid size={18} className="text-bastion-sapphire" /> : <Activity size={18} className="text-bastion-sapphire" />}
-              <h2 className="text-sm font-black uppercase tracking-[0.2em] text-white">
-                {currentView === 'dashboard' ? 'Security Audit Control' : 'Infrastructure Health Monitor'}
+        <header className="h-16 border-b border-bastion-border px-8 flex items-center justify-between bg-bastion-navy/30 backdrop-blur-xl z-10">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 bg-bastion-sapphire/10 rounded-lg border border-bastion-sapphire/20">
+                {currentView === 'dashboard' ? <LayoutGrid size={16} className="text-bastion-sapphire" /> : <Activity size={16} className="text-bastion-sapphire" />}
+              </div>
+              <h2 className="text-[11px] font-black uppercase tracking-[0.25em] text-white">
+                {currentView === 'dashboard' ? 'Security Audit' : 'System Health'}
               </h2>
             </div>
             
-            <div className="h-6 w-px bg-bastion-border" />
+            <div className="h-4 w-px bg-bastion-border" />
             
-            <div className="flex items-center gap-3">
-              <Activity size={16} className="text-bastion-green" />
-              <div className="flex gap-1 h-2.5 items-end">
-                {[4, 7, 3, 9, 5].map((h, i) => (
+            <div className="flex items-center gap-4">
+              <div className="flex gap-0.5 h-3 items-end">
+                {[3, 6, 4, 8, 5, 7, 4].map((h, i) => (
                   <motion.div 
                     key={i} 
                     animate={{ height: h * 1.2 }} 
-                    transition={{ repeat: Infinity, duration: 2, delay: i * 0.1 }}
-                    className="w-0.5 bg-bastion-green/40 rounded-full" 
+                    transition={{ repeat: Infinity, duration: 1.5, delay: i * 0.15 }}
+                    className="w-0.5 bg-bastion-green/60 rounded-full" 
                   />
                 ))}
               </div>
+              <span className="text-[9px] font-bold text-bastion-green uppercase tracking-widest">Active Monitoring</span>
             </div>
           </div>
 
           <div className="flex items-center gap-6">
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-bastion-sapphire transition-colors" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-bastion-sapphire transition-colors" size={14} />
               <input 
                 type="text" 
-                placeholder="Search Audit Trail..." 
-                className="bg-bastion-navy-light border border-bastion-border rounded-lg pl-10 pr-4 py-2 text-xs font-medium w-64 focus:outline-none focus:border-bastion-sapphire transition-all"
+                placeholder="Search logs..." 
+                className="bg-black/20 border border-bastion-border rounded-lg pl-9 pr-4 py-1.5 text-[11px] font-medium w-56 focus:outline-none focus:border-bastion-sapphire focus:bg-black/40 transition-all text-slate-300"
               />
             </div>
             
             <div className="flex items-center gap-4">
-              <button className="p-2 text-slate-400 hover:text-white relative">
-                <Bell size={20} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-bastion-crimson rounded-full border-2 border-bastion-navy" />
-              </button>
               <button 
                 onClick={() => setIsKillSwitchOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-bastion-crimson/10 border border-bastion-crimson/30 rounded-lg text-bastion-crimson font-black text-[10px] uppercase tracking-widest hover:bg-bastion-crimson/20 transition-all shadow-[0_0_20px_rgba(175,41,47,0.1)] group"
+                className="flex items-center gap-2 px-3 py-1.5 bg-bastion-crimson border border-bastion-crimson/50 rounded-lg text-white font-black text-[9px] uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-bastion-crimson/20"
               >
-                <Power size={14} className="group-hover:rotate-12 transition-transform" />
-                Live Kill-Switch
+                <Power size={12} />
+                Kill-Switch
               </button>
-              <div className="flex items-center gap-3 pl-4 border-l border-bastion-border">
-                <div className="text-right">
-                  <p className="text-xs font-bold text-white tracking-tight">C. Arbuthnot</p>
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Lead Audit Officer</p>
+              
+              <div className="h-6 w-px bg-bastion-border" />
+
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden sm:block">
+                  <p className="text-[11px] font-bold text-white leading-none mb-0.5">C. Arbuthnot</p>
+                  <p className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Audit Lead</p>
                 </div>
-                <div className="w-9 h-9 rounded-lg bg-bastion-navy-light border border-bastion-border flex items-center justify-center">
-                  <UserCircle size={24} className="text-slate-400" />
+                <div className="w-8 h-8 rounded-lg bg-bastion-navy border border-bastion-border flex items-center justify-center cursor-pointer hover:border-slate-500 transition-colors">
+                  <UserCircle size={18} className="text-slate-500" />
                 </div>
               </div>
             </div>

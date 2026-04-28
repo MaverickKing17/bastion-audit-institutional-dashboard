@@ -53,43 +53,41 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
       </nav>
 
       <div className="space-y-1">
-        <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-3 block">Tenant Context</label>
-        <div className="p-4 bg-bastion-navy-light rounded-xl border border-bastion-border group cursor-pointer hover:border-slate-700 transition-all">
+        <label className="label-xs mb-3 block">Tenant Context</label>
+        <div className="p-3 bg-bastion-navy-light/50 rounded-xl border border-bastion-border group cursor-pointer hover:border-bastion-sapphire/30 transition-all">
           <div className="flex items-center gap-3">
-             <Globe className="text-bastion-sapphire" size={18} />
-             <div>
-               <p className="text-xs font-bold text-white uppercase tracking-tight">Global Enterprise</p>
-               <p className="text-[10px] text-slate-500 mt-1 uppercase font-medium">14 Active Agents</p>
+             <div className="w-8 h-8 rounded-lg bg-bastion-navy border border-white/5 flex items-center justify-center">
+               <Globe className="text-bastion-sapphire" size={14} />
              </div>
-             <ChevronRight size={14} className="ml-auto text-slate-700 group-hover:text-slate-500" />
+             <div>
+               <p className="text-[11px] font-bold text-white uppercase tracking-tight">Global Enterprise</p>
+               <p className="text-[9px] text-slate-500 uppercase font-medium">14 Active Agents</p>
+             </div>
           </div>
         </div>
       </div>
 
       <div className="space-y-4">
-        <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-1 block">Management Actions</label>
-        <button className="w-full flex items-center gap-3 p-3 text-xs font-bold text-slate-400 bg-white/5 border border-white/5 rounded-lg hover:bg-white/10 transition-colors group">
-          <Lock size={14} className="group-hover:text-bastion-crimson" />
-          <span>Elevated Privileges Required</span>
+        <label className="label-xs mb-1 block">Governance</label>
+        <button className="w-full flex items-center gap-3 p-2.5 text-[10px] font-bold text-slate-500 bg-white/5 border border-white/5 rounded-lg hover:bg-white/10 transition-colors group uppercase tracking-widest">
+          <Lock size={12} className="group-hover:text-bastion-crimson" />
+          <span>Privileges Locked</span>
         </button>
       </div>
 
-      <div className="space-y-4">
-        <label className="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] mb-1 block">Data Residency</label>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center text-[11px]">
-            <span className="text-slate-500 uppercase font-medium">Primary Region</span>
+      <div className="space-y-3">
+        <label className="label-xs mb-1 block">Residency</label>
+        <div className="space-y-2 px-1">
+          <div className="flex justify-between items-center text-[10px]">
+            <span className="text-slate-500 uppercase font-medium">Primary</span>
             <span className="text-white font-bold uppercase tracking-tight flex items-center gap-1.5">
               <span className="w-1 h-1 rounded-full bg-bastion-green animate-pulse" />
-              Canada Central
+              CA-CENTRAL
             </span>
           </div>
-          <div className="flex justify-between items-center text-[11px]">
-            <span className="text-slate-500 uppercase font-medium">Failover</span>
-            <span className="text-slate-400 font-bold uppercase tracking-tight">Canada East</span>
-          </div>
-          <div className="p-2.5 bg-bastion-green/10 border border-bastion-green/30 rounded-lg">
-             <p className="text-[9px] text-bastion-green font-black uppercase leading-tight tracking-[0.05em]">Sovereign Infrastructure compliant</p>
+          <div className="flex justify-between items-center text-[10px]">
+            <span className="text-slate-500 uppercase font-medium">Compliance</span>
+            <span className="text-bastion-green font-bold uppercase tracking-tight">E-21 Verified</span>
           </div>
         </div>
       </div>

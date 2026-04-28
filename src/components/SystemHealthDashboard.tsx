@@ -10,7 +10,40 @@ const MOCK_COMPONENTS: ComponentHealth[] = [
   { name: 'Firestore DB', status: 'OPERATIONAL', uptime: '99.98%', latency: 8, cpu: 22, memory: 64, lastPulse: '2s ago' },
   { name: 'Agent Monitor', status: 'OPERATIONAL', uptime: '100%', latency: 45, cpu: 8, memory: 12, lastPulse: 'Now' },
   { name: 'Encryption Vault', status: 'DEGRADED', uptime: '99.95%', latency: 154, cpu: 45, memory: 88, lastPulse: '12s ago' },
+  { name: 'Canadian Edge Gateway', status: 'OUTAGE', uptime: '98.42%', latency: 0, cpu: 0, memory: 0, lastPulse: '5m ago' },
 ];
+
+function ComponentStatusBadge({ status }: { status: ComponentHealth['status'] }) {
+  const configs = {
+    OPERATIONAL: {
+      color: 'text-bastion-green',
+      bg: 'bg-bastion-green/10',
+      border: 'border-bastion-green/20',
+      icon: <CheckCircle2 size={12} />,
+    },
+    DEGRADED: {
+      color: 'text-bastion-gold',
+      bg: 'bg-bastion-gold/10',
+      border: 'border-bastion-gold/20',
+      icon: <AlertTriangle size={12} />,
+    },
+    OUTAGE: {
+      color: 'text-bastion-crimson',
+      bg: 'bg-bastion-crimson/10',
+      border: 'border-bastion-crimson/20',
+      icon: <Zap size={12} />,
+    }
+  };
+
+  const config = configs[status];
+
+  return (
+    <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border ${config.bg} ${config.border} ${config.color}`}>
+      {config.icon}
+      <span className="text-[10px] font-black uppercase tracking-widest">{status}</span>
+    </div>
+  );
+}
 
 const MOCK_LATENCY_DATA: HealthMetric[] = Array.from({ length: 20 }, (_, i) => ({
   timestamp: `${i}:00`,
@@ -161,20 +194,28 @@ export function SystemHealthDashboard() {
 }
 
 function NodeCard({ node, ...props }: { node: ComponentHealth, [key: string]: any }) {
+  const statusColors = {
+    OPERATIONAL: { border: 'border-bastion-green/20', iconColor: 'text-bastion-green', shadow: 'shadow-[0_0_15px_rgba(46,204,113,0.1)]' },
+    DEGRADED: { border: 'border-bastion-gold/20', iconColor: 'text-bastion-gold', shadow: 'shadow-[0_0_15px_rgba(212,175,55,0.1)]' },
+    OUTAGE: { border: 'border-bastion-crimson/20', iconColor: 'text-bastion-crimson', shadow: 'shadow-[0_0_15px_rgba(175,41,47,0.1)]' }
+  };
+
+  const currentStatus = statusColors[node.status];
+
   return (
-    <div className="institutional-card p-5 group hover:border-bastion-sapphire/30 transition-all cursor-pointer" {...props}>
+    <div className={`institutional-card p-5 group hover:border-bastion-sapphire/30 transition-all cursor-pointer ${currentStatus.shadow}`} {...props}>
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg bg-bastion-navy border ${node.status === 'OPERATIONAL' ? 'border-bastion-green/20' : 'border-bastion-gold/20'}`}>
-            {node.name.includes('DB') ? <Database size={16} className="text-bastion-sapphire" /> : 
-             node.name.includes('Guard') ? <Shield size={16} className="text-bastion-green" /> : 
-             <Server size={16} className="text-slate-400" />}
+          <div className={`p-2 rounded-lg bg-bastion-navy border ${currentStatus.border}`}>
+            {node.name.includes('DB') ? <Database size={16} className={currentStatus.iconColor} /> : 
+             node.name.includes('Guard') ? <Shield size={16} className={currentStatus.iconColor} /> : 
+             node.name.includes('Gateway') ? <Zap size={16} className={currentStatus.iconColor} /> :
+             <Server size={16} className={currentStatus.iconColor} />}
           </div>
           <div>
             <h3 className="text-sm font-black text-white uppercase tracking-tight">{node.name}</h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className={`w-1.5 h-1.5 rounded-full ${node.status === 'OPERATIONAL' ? 'bg-bastion-green shadow-[0_0_8px_rgba(46,204,113,0.5)]' : 'bg-bastion-gold'}`} />
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{node.status}</span>
+            <div className="flex items-center gap-2 mt-1">
+              <ComponentStatusBadge status={node.status} />
             </div>
           </div>
         </div>
@@ -197,6 +238,8 @@ function NodeCard({ node, ...props }: { node: ComponentHealth, [key: string]: an
 }
 
 function ResourceGauge({ label, value, color }: { label: string, value: number, color: string }) {
+  const dynamicColor = value > 85 ? 'bg-bastion-crimson' : value > 70 ? 'bg-bastion-gold' : color;
+  
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-end">
@@ -207,7 +250,7 @@ function ResourceGauge({ label, value, color }: { label: string, value: number, 
         <motion.div 
           initial={{ width: 0 }}
           animate={{ width: `${value}%` }}
-          className={`h-full rounded-full ${color}`} 
+          className={`h-full rounded-full ${dynamicColor} transition-colors duration-500`} 
         />
       </div>
     </div>
