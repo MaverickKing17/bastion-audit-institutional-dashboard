@@ -28,7 +28,7 @@ export function Footer({ onSelect }: FooterProps) {
 
         {/* Regulatory Column */}
         <div className="col-span-1">
-          <h4 className="label-xs mb-6 text-white opacity-50">Compliance Frameworks</h4>
+          <h4 className="label-xs mb-6 text-white font-black">Compliance Frameworks</h4>
           <ul className="space-y-3">
             <RegulatoryItem label="OSFI E-21 (Operational Risk)" onClick={() => onSelect('OSFI E-21')} />
             <RegulatoryItem label="PIPEDA (Data Privacy)" onClick={() => onSelect('PIPEDA')} />
@@ -40,7 +40,7 @@ export function Footer({ onSelect }: FooterProps) {
 
         {/* Governance Column */}
         <div className="col-span-1">
-          <h4 className="label-xs mb-6 text-white opacity-50">Governance & Policy</h4>
+          <h4 className="label-xs mb-6 text-white font-black">Governance & Policy</h4>
           <ul className="space-y-4">
             <FooterLink label="AML & KYC Compliance" onClick={() => onSelect('AML')} />
             <FooterLink label="Conflict of Interest" onClick={() => onSelect('CONFLICTS')} />

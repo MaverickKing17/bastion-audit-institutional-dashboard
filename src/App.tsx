@@ -166,8 +166,8 @@ export default function App() {
         </header>
 
         {/* Dashboard Content - 12 Column Grid */}
-        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-          <div className="max-w-7xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar flex flex-col">
+          <div className="max-w-7xl mx-auto flex-1 w-full">
             {currentView === 'dashboard' ? (
               <div className="space-y-12">
                 {/* TIER 1: Executive Critical Zone */}
@@ -178,15 +178,15 @@ export default function App() {
                 <div className="h-px bg-bastion-border-dim" />
 
                 {/* TIER 2: Analyst Operational Zone */}
-                <section id="tier-2" className="grid grid-cols-12 gap-8 min-h-[600px]">
+                <section id="tier-2" className="grid grid-cols-12 gap-8">
                   <div className="col-span-12 xl:col-span-8 flex flex-col">
-                    <div className="flex-1 bg-bastion-surface border border-bastion-border rounded-xl shadow-2xl relative overflow-hidden min-h-[500px]">
+                    <div className="flex-1 bg-bastion-surface border border-bastion-border rounded-xl shadow-2xl relative overflow-hidden min-h-[400px]">
                        <AgentBehaviorStream events={events} />
                     </div>
                   </div>
                   
                   <div className="col-span-12 xl:col-span-4 flex flex-col">
-                    <div className="flex-1 bg-bastion-surface border border-bastion-border rounded-xl p-10 shadow-xl flex flex-col">
+                    <div className="bg-bastion-surface border border-bastion-border rounded-xl p-10 shadow-xl flex flex-col h-full">
                        <div className="flex items-center gap-3 mb-12 text-[var(--color-text-muted)]">
                          <div className="p-2 bg-bastion-sapphire/5 rounded-lg border border-bastion-sapphire/10">
                            <ShieldCheck size={16} className="text-bastion-sapphire" />
@@ -194,14 +194,14 @@ export default function App() {
                          <span className="text-[11px] font-black uppercase tracking-[0.2em] leading-none text-[var(--color-text-primary)]">Audit Readiness Score</span>
                        </div>
                        
-                       <div className="flex-1 flex flex-col">
+                       <div className="flex flex-col">
                           <div className="flex items-baseline gap-3 mb-2">
                             <span className="text-7xl font-light tracking-tighter text-[var(--color-text-primary)]">94.2</span>
                             <span className="text-xs font-black text-bastion-green uppercase tracking-widest">+2.3% ▲</span>
                           </div>
                           <p className="text-[10px] text-[var(--color-text-muted)] font-bold uppercase tracking-[0.25em] mb-12">Institutional Stability Index</p>
                           
-                          <div className="space-y-8">
+                          <div className="space-y-6">
                             <AuditMetric label="Data Forensic Trace" value={98} />
                             <AuditMetric label="Identity Verifiability" value={91} />
                             <AuditMetric label="Model Drift Threshold" value={95} />
