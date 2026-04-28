@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-bastion-navy: #0B1221;
+  --color-bastion-navy-light: #161F30;
+  --color-bastion-crimson: #AF292F;
+  --color-bastion-gold: #D4AF37;
+  --color-bastion-sapphire: #4A90E2;
+  --color-bastion-green: #2ECC71;
+  --color-bastion-border: #1E293B;
+}
+
+@layer base {
+  body {
+    @apply bg-bastion-navy text-slate-200 antialiased selection:bg-bastion-crimson/30;
+  }
+}
+
+@layer components {
+  .institutional-card {
+    @apply bg-bastion-navy-light border border-bastion-border rounded-lg shadow-xl overflow-hidden;
+  }
+  
+  .terminal-text {
+    @apply font-mono text-[13px] leading-relaxed tracking-tight;
+  }
+}
