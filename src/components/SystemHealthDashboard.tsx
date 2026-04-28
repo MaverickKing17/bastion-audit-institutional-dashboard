@@ -33,24 +33,47 @@ function ConnectionLine({
   const isDegraded = status === 'DEGRADED';
   const isHighLatency = latency > 30;
   
-  const strokeColor = !isOnline ? '#ef4444' : (isDegraded || isHighLatency) ? '#d4af37' : '#2ecc71';
+  const colors = {
+    OPERATIONAL: '#2ecc71',
+    DEGRADED: '#FFD700',
+    LATENCY_WARNING: '#FF8C00', // Tangerine for high latency
+    OUTAGE: '#ef4444'
+  };
+
+  const strokeColor = !isOnline 
+    ? colors.OUTAGE 
+    : isDegraded 
+      ? colors.DEGRADED 
+      : isHighLatency 
+        ? colors.LATENCY_WARNING 
+        : colors.OPERATIONAL;
+
   const pulseDuration = !isOnline ? 0 : Math.max(0.3, latency / 50);
 
   return (
     <svg className={`absolute inset-0 w-8 h-full -left-4 pointer-events-none z-0 ${className}`}>
+      <defs>
+        <filter id="lineGlow">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
       <motion.path
-        d="M 16 0 L 16 48" // matches the container h-12 (48px)
+        d="M 16 0 L 16 48"
         stroke={strokeColor}
         strokeWidth={isHighLatency ? "3" : "2"}
         strokeDasharray={isHighLatency ? "2 2" : "4 4"}
         fill="transparent"
         initial={{ opacity: 0.1 }}
         animate={{ 
-          opacity: isOnline ? [0.1, 0.4, 0.1] : 0.05,
-          x: isHighLatency ? [0.5, -0.5, 0.5] : 0
+          opacity: isOnline ? (isHighLatency ? [0.2, 0.6, 0.2] : [0.1, 0.4, 0.1]) : 0.05,
+          x: isHighLatency ? [0.8, -0.8, 0.8] : 0
+        }}
+        style={{ 
+          filter: isOnline ? `drop-shadow(0 0 3px ${strokeColor}44)` : 'none'
         }}
         transition={{ 
-          opacity: { duration: 2, repeat: Infinity },
+          opacity: { duration: isHighLatency ? 1 : 2, repeat: Infinity },
           x: { duration: 0.1, repeat: Infinity, ease: "linear" }
         }}
       />
@@ -58,15 +81,22 @@ function ConnectionLine({
         <motion.circle
           r={isHighLatency ? "4" : "3"}
           fill={strokeColor}
-          initial={{ cy: 0 }}
-          animate={{ cy: 48 }}
-          transition={{ 
-            duration: pulseDuration, 
-            repeat: Infinity, 
-            ease: "linear" 
+          initial={{ cy: 0, scale: 1 }}
+          animate={{ 
+            cy: 48,
+            scale: isHighLatency ? [1, 1.6, 1] : 1,
+            opacity: isHighLatency ? [0.7, 1, 0.7] : 1
           }}
-          style={{ cx: 16 }}
-          className="filter blur-[1px]"
+          transition={{ 
+            cy: { duration: pulseDuration, repeat: Infinity, ease: "linear" },
+            scale: { duration: 0.6, repeat: Infinity, ease: "easeInOut" },
+            opacity: { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
+          }}
+          style={{ 
+            cx: 16,
+            filter: `drop-shadow(0 0 4px ${strokeColor})`
+          }}
+          className="filter blur-[0.5px]"
         />
       )}
     </svg>
